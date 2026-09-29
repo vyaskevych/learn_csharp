@@ -1,0 +1,620 @@
+/* Color palette based on Borys Grinchenko Kyiv Metropolitan University Brandbook */
+:root {
+    --primary-color: #00828A; /* Corporate Teal */
+    --primary-dark: #005F66;
+    --secondary-color: #FFC000; /* Corporate Yellow/Gold */
+    --bg-light: #F5F7FA;
+    --bg-white: #FFFFFF;
+    --text-main: #333333;
+    --text-muted: #666666;
+    --border-light: #E0E0E0;
+    
+    /* Semantic Colors */
+    --status-good: #2E7D32;
+    --status-warning: #F57C00;
+    --status-critical: #C62828;
+    
+    /* Decorative block colors */
+    --sq-1: #00828A;
+    --sq-2: #005F66;
+    --sq-3: #FFC000;
+    --sq-4: #4FACFE;
+    --sq-5: #43E97B;
+    --sq-6: #FA709A;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Montserrat', 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    overflow: hidden;
+    height: 100vh;
+    color: var(--text-main);
+}
+
+.presentation-container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.slide {
+    background: var(--bg-white);
+    width: 90%;
+    max-width: 1200px;
+    height: 85vh;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 35px 50px; /* Зменшено вертикальні відступи для збільшення робочої зони */
+    display: none;
+    flex-direction: column;
+    position: relative;
+    animation: slideIn 0.5s ease-out;
+}
+
+.slide.active {
+    display: flex;
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.university-logo {
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    width: 75px;
+    height: auto;
+    z-index: 1000;
+}
+
+.slide-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 20px; /* Зменшено відступ після заголовка */
+    padding-right: 120px;
+}
+
+h1 {
+    font-size: 2.8em;
+    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+}
+
+h3 {
+    font-size: 1.6em;
+    color: var(--primary-color);
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.section-title {
+    font-size: 1.4em;
+}
+
+.no-margin-top {
+    margin-top: 0;
+}
+
+.subtitle {
+    font-size: 1.3em;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+}
+
+.content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 15px;
+}
+
+.title-slide-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.metadata {
+    margin-top: 30px;
+    font-size: 1.1em;
+    color: var(--text-muted);
+    line-height: 1.5;
+}
+
+.content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.content::-webkit-scrollbar-track {
+    background: #F1F1F1;
+    border-radius: 10px;
+}
+
+.content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 10px;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+li {
+    padding: 8px 0;
+    padding-left: 25px;
+    position: relative;
+    font-size: 1.05em;
+    line-height: 1.5;
+}
+
+li:before {
+    content: "▶";
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-size: 0.8em;
+    top: 11px;
+}
+
+.ordered-list {
+    list-style: decimal;
+    padding-left: 20px;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.ordered-list li:before {
+    content: "";
+}
+
+.ordered-list li {
+    padding-left: 5px;
+}
+
+.standard-list {
+    font-size: 0.9em;
+    margin-top: 10px;
+}
+
+.smell-list {
+    font-size: 0.95em;
+}
+
+.two-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.three-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+.box {
+    background: var(--bg-light);
+    padding: 20px;
+    border-radius: 12px;
+    border-left: 5px solid var(--primary-color);
+}
+
+.box h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 1.2em;
+}
+
+.box-desc {
+    font-size: 0.85em;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+}
+
+.full-width-box {
+    margin-top: 15px;
+}
+
+.tight-box {
+    padding: 12px 15px;
+    margin-bottom: 12px;
+}
+
+.primary-box {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    border-left: none;
+}
+
+.primary-box h4 {
+    color: white;
+}
+
+.accent-box {
+    margin-top: 25px;
+    text-align: center;
+}
+
+.target-box {
+    margin-top: 20px;
+    text-align: center;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    border-left: none;
+}
+
+.target-box h4 {
+    color: white;
+}
+
+.target-text {
+    font-size: 1.2em;
+    margin-top: 10px;
+}
+
+.warning-box {
+    background: #ffe0e0;
+    border-left-color: var(--status-critical);
+}
+
+.warning-box h4 {
+    color: var(--status-critical);
+}
+
+.success-box {
+    background: #e0ffe0;
+    border-left-color: var(--status-good);
+}
+
+.success-box h4 {
+    color: var(--status-good);
+}
+
+.light-blue-box {
+    background: #E3F2FD;
+    border-left-color: #1976D2;
+}
+
+.light-orange-box {
+    background: #FFF3E0;
+    border-left-color: #F57C00;
+}
+
+.light-gray-bg {
+    background: #F5F7FA;
+    border-left: none;
+}
+
+.formula {
+    background: #F8F9FA;
+    padding: 15px;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    text-align: center;
+    margin: 10px 0;
+    border: 2px solid var(--primary-color);
+    font-size: 1.1em;
+}
+
+.formula-desc {
+    text-align: center;
+    color: var(--text-muted);
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.note {
+    font-size: 0.9em;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* ========================================= */
+/* ОНОВЛЕНИЙ БЛОК НАВІГАЦІЇ (Зменшено висоту) */
+/* ========================================= */
+.navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 15px; /* Було 30px */
+    padding-top: 12px; /* Було 20px */
+    border-top: 2px solid var(--border-light);
+}
+
+.btn {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    border: none;
+    padding: 8px 22px; /* Було 12px 30px */
+    border-radius: 20px; /* Було 25px */
+    cursor: pointer;
+    font-size: 0.95em;
+    font-weight: bold;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 130, 138, 0.4);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.slide-counter {
+    font-size: 0.95em; /* Було 1.1em */
+    color: var(--text-muted);
+    font-weight: bold;
+}
+/* ========================================= */
+
+.model-comparison {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.model-card {
+    background: white;
+    border: 3px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 15px;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+.model-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 10px 25px rgba(0, 130, 138, 0.2);
+}
+
+.model-card h4 {
+    color: var(--primary-color);
+    margin-bottom: 10px;
+    font-size: 1.3em;
+}
+
+.card-subtitle {
+    color: var(--text-muted);
+    margin-top: 8px;
+    font-size: 0.9em;
+}
+
+.card-details {
+    margin-top: 12px;
+    font-size: 0.85em;
+    text-align: left;
+}
+
+.metric-grid-2x2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.metric-item {
+    background: #EAF3F4;
+    padding: 15px;
+    border-radius: 10px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.metric-item strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.metric-desc {
+    margin-top: 8px;
+    font-size: 0.85em;
+}
+
+.bg-red-light {
+    background: #ffebee;
+}
+
+.bg-orange-light {
+    background: #fff3e0;
+}
+
+.cmmi-levels {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 15px;
+}
+
+.level {
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    transition: transform 0.3s;
+}
+
+.level:hover {
+    transform: translateX(10px);
+}
+
+.level-number {
+    font-size: 1.8em;
+    font-weight: bold;
+    background: white;
+    color: var(--primary-color);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.op-70 { opacity: 0.7; }
+.op-80 { opacity: 0.8; }
+.op-85 { opacity: 0.85; }
+.op-90 { opacity: 0.9; }
+.op-100 { opacity: 1; }
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.9em;
+}
+
+.data-table th, .data-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.data-table th {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: white;
+    font-weight: bold;
+}
+
+.data-table tr:hover {
+    background: var(--bg-light);
+}
+
+.iso-characteristics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.characteristic {
+    background: var(--bg-light);
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 4px solid var(--primary-color);
+}
+
+.characteristic-title {
+    color: var(--primary-color);
+    font-weight: bold;
+    font-size: 1em;
+    margin-bottom: 8px;
+}
+
+.characteristic ul {
+    font-size: 0.85em;
+}
+
+.characteristic li {
+    padding: 3px 0;
+    padding-left: 12px;
+    line-height: 1.3;
+}
+
+.characteristic li:before {
+    content: "•";
+    font-size: 1.2em;
+    top: 1px;
+}
+
+.square-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.square-item {
+    padding: 12px;
+}
+
+.border-color-1 { border-left-color: var(--sq-1); }
+.border-color-2 { border-left-color: var(--sq-2); }
+.border-color-3 { border-left-color: var(--sq-3); }
+.border-color-4 { border-left-color: var(--sq-4); }
+.border-color-5 { border-left-color: var(--sq-5); }
+.border-color-6 { border-left-color: var(--sq-6); }
+
+.code-block {
+    background: #2D2D2D;
+    color: #CCCCCC;
+    padding: 12px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.85em;
+    font-family: 'Courier New', monospace;
+}
+
+/* Styling for code blocks */
+pre {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    font-size: 14px;
+    border: 1px solid var(--border-light);
+}
+
+pre code {
+    font-family: 'Courier New', monospace;
+    border-radius: 8px;
+    padding: 15px !important;
+    line-height: 1.4;
+}
+
+.status-good { color: var(--status-good); font-weight: bold; }
+.status-warning { color: var(--status-warning); font-weight: bold; }
+.status-critical { color: var(--status-critical); font-weight: bold; }
+
+.blue-text { color: #1976D2; }
+.orange-text { color: #F57C00; }
+.white-text { color: white; }
+.primary-text { color: var(--primary-color); font-size: 1.1em;}
+.large-text { font-size: 1.4em; }
+
+.center-text { text-align: center; }
+
+.push-down { margin-top: 15px; }
+.vertical-flex { display: flex; flex-direction: column; gap: 12px; }
+.intro-text { margin-bottom: 12px; }
+
+
+/* Стилі для інлайн-коду (всередині тексту, списків, блоків) */
+:not(pre) > code {
+    font-family: 'Courier New', Consolas, monospace;
+    font-size: 1.05em; /* Збільшуємо розмір, щоб вирівняти зі звичайним текстом */
+    font-weight: 600; /* Робимо трохи жирнішим */
+    color: var(--primary-dark); /* Корпоративний темний колір для тексту коду */
+    background-color: rgba(0, 0, 0, 0.06); /* Напівпрозорий сірий фон для контрасту */
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap; /* Щоб короткий код не розривався на два рядки */
+}

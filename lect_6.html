@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Інкапсуляція, властивості та статичні члени класу</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Підключення Highlight.js для красивого форматування коду -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tomorrow-night-blue.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="presentation-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="content title-slide-content">
+                <h1>Лекція 6. Інкапсуляція, властивості (get/set) та статичні члени класу (static)</h1>
+                <p class="subtitle">Модуль 3. Об’єктно-орієнтоване програмування</p>
+                <div class="metadata">
+                    <p><strong>Курс:</strong> Об'єктно-орієнтовне програмування</p>
+                    <p><strong>Спеціальність:</strong> F3 Комп’ютерні науки</p>
+                    <p>Київський столичний університет імені Бориса Грінченка</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn" id="prevBtn" disabled>← Попередній</button>
+                <span class="slide-counter"><span class="current">1</span> / <span class="total">20</span></span>
+                <button class="btn" id="nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: План лекції -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>План лекції</h2>
+            </div>
+            <div class="content">
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">1. Проблема відкритого стану</strong>
+                        <p class="metric-desc">Чому використання публічних полів порушує цілісність даних та вважається
+                            антипатерном.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">2. Інкапсуляція та модифікатори доступу</strong>
+                        <p class="metric-desc">Приховування реалізації (`private`) та створення публічного інтерфейсу
+                            (`public`). UML-нотація.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">3. Властивості (Properties) та валідація</strong>
+                        <p class="metric-desc">Розумний доступ до даних через аксесори `get` та `set`. Ключове слово
+                            `value`.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">4. Сучасний синтаксис C#</strong>
+                        <p class="metric-desc">Авто-властивості, expression-bodied members (`=>`), створення незмінних
+                            об'єктів (`init`, `required`).</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">5. Статичні члени та класи (`static`)</strong>
+                        <p class="metric-desc">Різниця між пам'яттю конкретного об'єкта та спільною пам'яттю типу.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">2</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Проблема відкритого стану -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Чому public поля — це антипатерн?</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Якщо стан об'єкта (поля) повністю відкритий, компілятор дозволить записати туди
+                    будь-які математично можливі, але логічно <strong>абсурдні значення</strong>.</p>
+                <div class="two-columns">
+                    <div class="box">
+                        <h4>Архітектурна вразливість</h4>
+                        <p>Компілятор не знає бізнес-логіки вашої програми. Для нього змінна <code>width</code> типу
+                            <code>double</code> може приймати будь-які від'ємні значення, хоча фізично коробка не може
+                            мати від'ємну ширину.
+                        </p>
+                    </div>
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class Box
+{
+    // Відкритий стан
+    public double width;
+    public double height;
+}
+
+// У методі Main:
+Box parcel = new Box();
+
+// Синтаксично правильно, 
+// логічно - катастрофа!
+parcel.width = -15.5; 
+parcel.height = 0;</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">3</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: Наслідки порушення цілісності -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Ефект метелика в архітектурі</h2>
+            </div>
+            <div class="content">
+                <div class="box full-width-box tight-box">
+                    <p>Об'єкт, що втратив контроль над власним станом, ламає всю подальшу роботу програми.</p>
+                </div>
+
+                <div class="two-columns push-down">
+                    <div class="box warning-box">
+                        <h4>⚠️ Невалідний стан</h4>
+                        <ul class="standard-list">
+                            <li>Користувач із віком <strong>-5 років</strong> (зламається логіка запису в БД).</li>
+                            <li>Банківський рахунок із прямим доступом до <strong>balance</strong> (ризик фінансових
+                                втрат або від'ємного балансу без транзакцій).</li>
+                            <li>Коробка з від'ємним об'ємом (краш системи розрахунку логістики).</li>
+                        </ul>
+                        <p style="margin-top: 15px;"><strong>Висновок:</strong> Об'єкт ПОВИНЕН сам контролювати власні
+                            дані!</p>
+                    </div>
+                    <div>
+                        <pre style="margin: 0;"><code class="language-csharp">User client = new User();
+client.Age = -5; 
+
+BankAccount account = new BankAccount();
+account.Balance = 9999999; 
+
+Box b = new Box();
+b.width = -100;
+// Поверне від'ємний об'єм
+Console.WriteLine(b.GetVolume());</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">4</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 5: Інкапсуляція (Метафора) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Інкапсуляція ("Чорний ящик")</h2>
+            </div>
+            <div class="content">
+                <div class="box primary-box">
+                    <h4>Визначення</h4>
+                    <p><strong>Інкапсуляція</strong> — це принцип приховування внутрішнього стану та деталей реалізації
+                        об'єкта. Взаємодія з ним відбувається виключно через чітко визначений "публічний інтерфейс".</p>
+                </div>
+
+                <div class="two-columns push-down">
+                    <div class="box light-blue-box">
+                        <h4 class="blue-text">Метафора: Банкомат</h4>
+
+                        <!-- Додане зображення банкомата -->
+                        <div style="text-align: center; margin: 15px 0;">
+                            <img src="pictures/atm.jpg" alt="Банкомат"
+                                style="max-width: 100%; max-height: 160px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                        </div>
+
+                        <p>Ви (користувач) не маєте прямого доступу до касет із грошима всередині банкомату.</p>
+                        <p style="margin-top: 10px;">Взаємодія йде через клавіатуру та екран, а банкомат <strong>сам
+                                вирішує</strong>, чи дозволити операцію (перевіряючи ПІН-код та залишок на балансі).</p>
+                    </div>
+                    <div class="box light-orange-box">
+                        <h4 class="orange-text">Проєкція на код</h4>
+                        <ul class="standard-list">
+                            <li><strong>Прихований стан:</strong> Змінні (поля) класу. Це наші касети з грошима.</li>
+                            <li><strong>Публічний інтерфейс:</strong> Дозволені методи (Властивості). Це клавіатура та
+                                екран.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">5</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 6: Модифікатори доступу в C# -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Керування доступом: private та public</h2>
+            </div>
+            <div class="content">
+                <div class="two-columns">
+                    <div class="box bg-orange-light">
+                        <h4 class="orange-text">private (Приватний)</h4>
+                        <p>Член класу доступний <strong>тільки всередині</strong> цього ж класу. Це наші надійно сховані
+                            дані. (У C# застосовується за замовчуванням).</p>
+                    </div>
+                    <div class="box bg-red-light" style="border-left-color: #2E7D32; background: #e8f5e9;">
+                        <h4 style="color: #2E7D32;">public (Публічний)</h4>
+                        <p>Член класу доступний <strong>звідусіль</strong> (з методу Main, з інших класів тощо). Це
+                            відкрита поведінка об'єкта.</p>
+                    </div>
+                </div>
+
+                <pre style="margin-top: 20px;"><code class="language-csharp">class Box
+{
+    // 1. Прихований стан (дані в безпеці)
+    private double width; 
+    private double height;
+    
+    // 2. Метод доступний всім
+    public double GetVolume() 
+    {
+        return width * height * depth; // Має доступ до своїх private полів
+    }
+}
+// parcel.width = -15.5; // ❌ ПОМИЛКА КОМПІЛЯЦІЇ!</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">6</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 7: UML Діаграми -->
+        <div class="slide">
+            <img src="image_7f85ec.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Графічне моделювання (UML)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Перед написанням коду архітектори проєктують класи за допомогою Unified Modeling
+                    Language (UML). Модифікатори доступу позначаються спеціальними символами.</p>
+
+                <div class="two-columns push-down">
+                    <!-- Таблиця символів -->
+                    <table class="data-table" style="margin-top: 0;">
+                        <tr>
+                            <th style="width: 25%; text-align: center;">Символ</th>
+                            <th style="width: 35%;">Модифікатор</th>
+                            <th>Значення</th>
+                        </tr>
+                        <tr>
+                            <td
+                                style="font-size: 1.4em; font-weight: bold; color: var(--status-critical); text-align: center;">
+                                -</td>
+                            <td><strong>private</strong></td>
+                            <td>Закритий доступ</td>
+                        </tr>
+                        <tr>
+                            <td
+                                style="font-size: 1.4em; font-weight: bold; color: var(--status-good); text-align: center;">
+                                +</td>
+                            <td><strong>public</strong></td>
+                            <td>Відкритий доступ</td>
+                        </tr>
+                    </table>
+
+                    <!-- UML Прямокутник класу -->
+                    <div
+                        style="background: var(--bg-white); border: 2px solid var(--primary-color); border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); overflow: hidden; font-family: monospace; font-size: 0.95em;">
+                        <!-- Заголовок класу -->
+                        <div
+                            style="background: var(--primary-color); color: white; padding: 10px; text-align: center; font-weight: bold; font-family: 'Montserrat', sans-serif;">
+                            Box
+                        </div>
+                        <!-- Секція полів -->
+                        <div
+                            style="padding: 12px 15px; border-bottom: 1px solid var(--border-light); background: #FAFAFA;">
+                            <div style="color: var(--status-critical); margin-bottom: 4px;">- width : double</div>
+                            <div style="color: var(--status-critical);">- height : double</div>
+                        </div>
+                        <!-- Секція методів -->
+                        <div style="padding: 12px 15px; background: #FAFAFA;">
+                            <div style="color: var(--status-good);">+ GetVolume() : double</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">7</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 8: Класичне рішення -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Конструктори та методи Get/Set</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Якщо поля закриті (<code>private</code>), як змінити їх значення ззовні? Класичний
+                    підхід (використовується в Java та C++) вимагає створення спеціальних методів-посередників.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Box
+{
+    private double width; // Поле сховано
+
+    // Метод для безпечного ЗАПИСУ (з валідацією)
+    public void SetWidth(double w)
+    {
+        if (w > 0) this.width = w;
+    }
+
+    // Метод для безпечного ЧИТАННЯ
+    public double GetWidth() 
+    {
+        return this.width; 
+    }
+}</code></pre>
+                <div class="box warning-box tight-box">
+                    <p><strong>Проблема:</strong> Працювати з такими методами незручно. Замість звичного
+                        <code>box.width = 10;</code> доводиться писати <code>box.SetWidth(10);</code>. Код стає
+                        громіздким.
+                    </p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">8</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 9: Властивості -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Розумний доступ: Властивості у C#</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text"><strong>Властивість (Property)</strong> — це гібрид. Зовні вона виглядає та
+                    використовується як звичайне поле (через знак <code>=</code>), але всередині містить приховані
+                    методи для безпечного читання та запису даних.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Box
+{
+    private double width; // Backing field (Реальне сховище)
+
+    public double Width   // Публічна властивість (Шлюз безпеки)
+    {
+        get { return this.width; } // Спрацює при читанні
+        
+        set // Спрацює при записі
+        { 
+            // value - приховане ключове слово для вхідного значення
+            if (value > 0) this.width = value; 
+        }
+    }
+}</code></pre>
+                <div class="box success-box tight-box" style="margin-bottom: 0;">
+                    <p><strong>Використання:</strong> <code>box.Width = 15;</code> — викликає блок <code>set</code>, де
+                        змінна <code>value</code> дорівнює 15.</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">9</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 10: Валідація -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Промислова валідація даних</h2>
+            </div>
+            <div class="content">
+                <div class="box full-width-box tight-box" style="margin-bottom: 15px;">
+                    <p>У реальних проєктах використання <code>Console.WriteLine</code> всередині класів бізнес-логіки
+                        <strong>суворо заборонено</strong> (клас не повинен знати про консоль). Інженери використовують
+                        генерацію винятків (Exceptions).
+                    </p>
+                </div>
+
+                <pre style="margin-top: 0;"><code class="language-csharp">public double Width
+{
+    get { return this.width; }
+    set 
+    { 
+        if (value <= 0) 
+        {
+            // Жорстко зупиняємо виконання та сигналізуємо про помилку
+            throw new ArgumentException("Ширина має бути більшою за нуль!"); 
+        }
+            
+        this.width = value; 
+    }
+}</code></pre>
+
+                <p class="intro-text">Якщо програміст спробує написати <code>box.Width = -5;</code>, програма аварійно
+                    завершиться із чітким описом архітектурного порушення.</p>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">10</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 11: Практичний приклад з Pen -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Практичний приклад: Захист даних у класі Pen</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Розглянемо клас ручки (`Pen`), де за допомогою властивості <code>Color</code> реалізовано захист від некоректних даних.</p>
+                
+<pre style="margin-top: 10px; margin-bottom: 15px;"><code class="language-csharp">class Pen
+{
+    private string color; // Закрите поле для зберігання стану
+
+    public string Color   // Публічна властивість з логікою перевірки
+    {
+        get { return color; }
+        set
+        {
+            // Якщо код кольору не має 6 символів — встановлюємо чорний за замовчуванням
+            if (value.Length != 6) 
+            { 
+                color = "000000"; 
+            }
+            else 
+            {
+                color = value; 
+            }
+        }
+    }
+}</code></pre>
+
+                <div class="box light-blue-box tight-box">
+                    <p><strong>Як це працює:</strong> Прямий доступ до поля <code>color</code> заблоковано (`private`). Користувач взаємодіє лише з властивістю <code>Color</code>, а об'єкт самостійно гарантує, що у поле ніколи не потрапить шкідливе чи помилкове значення.</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">11</span> / <span class="total">23</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 12: Скорочений синтаксис -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Скорочений синтаксис (=>)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">У C# є зручний синтаксис <strong>Expression-bodied members</strong>. Якщо ваша
+                    властивість призначена ТІЛЬКИ для читання (не має <code>set</code>) і містить лише один вираз, код
+                    можна значно скоротити.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Rectangle
+{
+    private double width = 10;
+    private double height = 5;
+
+    // Класичний довгий запис (Read-Only властивість):
+    public double AreaClassic
+    {
+        get { return width * height; }
+    }
+
+    // Сучасний скорочений запис за допомогою "лямбди" (=>):
+    public double AreaModern => width * height;
+}</code></pre>
+
+                <div class="box light-blue-box tight-box">
+                    <p>Цей підхід ідеально підходить для <strong>обчислюваних властивостей</strong>, які не зберігають
+                        дані фізично, а розраховують їх "на льоту" на основі інших полів.</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">11</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 13: Автоматичні властивості -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Авто-властивості (Auto-properties)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Якщо валідація даних вам <strong>поки що не потрібна</strong>, немає сенсу вручну
+                    створювати приховане поле та писати базові <code>get/set</code>. Компілятор може зробити цю рутину
+                    за вас.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Order
+{
+    // Компілятор сам створить приховане поле "під капотом"
+    public string CustomerName { get; set; }
+    
+    // Властивість з початковим значенням
+    public string Status { get; set; } = "New";
+
+    // Прочитати можуть всі, а змінити - ТІЛЬКИ всередині цього класу
+    public int OrderId { get; private set; } 
+
+    public Order(int id)
+    {
+        OrderId = id; // Це працює завдяки private set
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">12</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 14: Властивості vs Відкриті поля -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Питання зі співбесіди: Властивості vs Поля</h2>
+            </div>
+            <div class="content">
+                <div class="box full-width-box tight-box" style="margin-bottom: 15px;">
+                    <p><em>"Чому авто-властивість <code>{ get; set; }</code> краща за звичайне відкрите поле, якщо
+                            візуально вони діють абсолютно однаково?"</em></p>
+                </div>
+
+                <div class="two-columns">
+                    <div>
+                        <pre style="margin: 0;"><code class="language-csharp">// ПОГАНА ПРАКТИКА:
+public string Name;
+
+// СУЧАСНИЙ СТАНДАРТ:
+public string Name { get; set; }</code></pre>
+                    </div>
+                    <div>
+                        <ul class="standard-list" style="margin-top: 0;">
+                            <li><strong>Майбутня гнучкість:</strong> До властивості можна легко додати логіку перевірки
+                                пізніше без порушення бінарної сумісності з іншим кодом.</li>
+                            <li><strong>Data Binding (Прив'язка даних):</strong> Такі технології як Entity Framework
+                                Core (Бази даних) або WPF (Інтерфейси) вміють працювати <em>лише з властивостями</em>.
+                            </li>
+                            <li><strong>Інтерфейси:</strong> C# дозволяє вимагати наявність властивостей в інтерфейсах,
+                                але не полів.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">13</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 15: Сучасний C# -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Сучасний C#: Безпека та Незмінність</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Сучасний архітектурний тренд — створення незмінних (<strong>immutable</strong>)
+                    об'єктів. Для цього у C# з'явилися інструменти <code>init</code> та <code>required</code>.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class ModernUser
+{
+    // required - ОБОВ'ЯЗКОВО задати значення при створенні (new)
+    // init     - Змінити значення після створення НЕМОЖЛИВО
+    public required string Username { get; init; }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Успішне створення об'єкта через ініціалізатор
+        ModernUser user = new ModernUser { Username = "admin" };
+        
+        // ❌ ПОМИЛКА КОМПІЛЯЦІЇ: init блокує зміну даних!
+        // user.Username = "hacker"; 
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">14</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 16: Статичні члени -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Пам'ять об'єкта vs Пам'ять типу (static)</h2>
+            </div>
+            <div class="content">
+                <div class="box full-width-box tight-box">
+                    <p>Зазвичай кожна властивість належить <strong>конкретному екземпляру</strong>. Однак іноді нам
+                        потрібні дані, спільні для всього креслення (класу). Для цього використовують ключове слово
+                        <code>static</code>.
+                    </p>
+                </div>
+
+                <div class="two-columns push-down">
+                    <div class="box light-blue-box">
+                        <h4 class="blue-text">Звичайні поля (Екземпляр)</h4>
+                        <ul class="standard-list">
+                            <li>Належать конкретній деталі.</li>
+                            <li>Зміна ширини однієї коробки не впливає на іншу коробку.</li>
+                            <li>Звернення: <code>box1.Width</code></li>
+                        </ul>
+                    </div>
+                    <div class="box light-orange-box">
+                        <h4 class="orange-text">Статичні поля (Клас)</h4>
+                        <ul class="standard-list">
+                            <li>Належать самому кресленню.</li>
+                            <li>Існують в єдиному екземплярі, діляться між усіма об'єктами.</li>
+                            <li>Звернення: <code>Box.TotalCount</code></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">15</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 17: Робота зі static -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Робота зі статичними полями</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Класичний приклад використання <code>static</code> — створення глобального
+                    лічильника створених екземплярів класу.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Box
+{
+    // Ця властивість належить всьому класу Box
+    public static int TotalBoxesCreated { get; private set; }
+
+    public Box() 
+    { 
+        // При кожному виклику конструктора збільшуємо спільний лічильник
+        TotalBoxesCreated++; 
+    }
+}
+
+// У методі Main:
+Box b1 = new Box();
+Box b2 = new Box();
+
+// Виклик відбувається через ім'я КЛАСУ, а не змінної b1 чи b2!
+Console.WriteLine(Box.TotalBoxesCreated); // Виведе 2</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">16</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 18: Обмеження статичних методів -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Правило ізоляції static</h2>
+            </div>
+            <div class="content">
+                <div class="box warning-box tight-box" style="margin-bottom: 15px;">
+                    <h4>⚠️ Критичне обмеження</h4>
+                    <p>Оскільки статичний метод викликається на рівні всього класу, він <strong>нічого не знає про
+                            конкретні екземпляри</strong>.</p>
+                </div>
+
+                <pre style="margin-top: 0;"><code class="language-csharp">class Box
+{
+    public double Width { get; set; } // Звичайна властивість
+
+    public static void PrintInfo()
+    {
+        // ❌ ПОМИЛКА КОМПІЛЯЦІЇ!
+        // Статичний метод не знає, ширину ЯКОЇ САМЕ коробки треба вивести
+        // Console.WriteLine(Width); 
+        
+        // ❌ ПОМИЛКА КОМПІЛЯЦІЇ!
+        // У статичному контексті не існує ключового слова this
+        // Console.WriteLine(this.Width); 
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">17</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 19: Статичні класи -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Статичні класи (static class)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Якщо ваш клас містить <strong>тільки</strong> глобальні функції або константи,
+                    його роблять статичним. Створити об'єкт (<code>new</code>) такого класу неможливо.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">public static class MathHelper
+{
+    // Всі члени всередині статичного класу ТАКОЖ мають бути статичними
+    public static double PI = 3.14159;
+    
+    public static double Square(double number)
+    {
+        return number * number;
+    }
+}
+
+// Використання без оператора new:
+double result = MathHelper.Square(5);
+Console.WriteLine(MathHelper.PI);
+
+// Ви постійно використовували статичні класи раніше:
+// Console.WriteLine(), Math.Round(), Array.Sort()</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">18</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 20: Тест 1 (Питання) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Практичний тест 1: Що виведе код?</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Проаналізуйте фрагмент коду зі статичним полем та спробуйте передбачити результат:</p>
+                
+<pre style="margin-top: 15px;"><code class="language-csharp">class Keeper
+{
+    public static int b;
+    public int getB() { return b; }
+}
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        int c = Keeper.b++;
+        int cc = new Keeper().getB();
+        Console.WriteLine(c + " " + cc);
+    }
+}</code></pre>
+
+                <div class="box light-blue-box tight-box">
+                    <p>💡 <em>Поміркуйте: чому дорівнює <code>Keeper.b</code> за замовчуванням і як спрацює постфіксний інкремент?</em></p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">19</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 21: Тест 1 (Відповідь) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Розбір тесту 1: Відповідь</h2>
+            </div>
+            <div class="content">
+                <div class="box success-box" style="margin-bottom: 20px;">
+                    <h4 style="font-size: 1.4em; margin-bottom: 5px;">Результат виконання: <code>0 1</code></h4>
+                </div>
+
+                <h3 class="section-title">Покроковий розбір:</h3>
+                <ul class="standard-list">
+                    <li>Статичне поле <code>Keeper.b</code> за замовчуванням ініціалізується нулем (<code>0</code>).</li>
+                    <li>У рядку <code>int c = Keeper.b++;</code> через <strong>постфіксний інкремент</strong> змінна <code>c</code> спочатку отримує поточне значення (<code>0</code>), а потім поле <code>b</code> збільшується до <code>1</code>.</li>
+                    <li>Створений об'єкт <code>new Keeper().getB()</code> звертається до цього ж спільного статичного поля і повертає актуальне значення — <code>1</code>.</li>
+                </ul>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">20</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 22: Тест 2 (Питання) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Практичний тест 2: Що виведе код?</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Визначте значення змінних <code>c</code> та <code>cc</code> після виконання програми:</p>
+                
+<pre style="margin-top: 15px;"><code class="language-csharp">class Program
+{
+    static int a = 10;
+    static int b = a;
+
+    static void Main(string[] args)
+    {
+        int c = ++a;
+        int cc = b++;
+        Console.WriteLine(c + " " + cc + " ");
+    }
+}</code></pre>
+
+                <div class="box light-orange-box tight-box">
+                    <p>💡 <em>Згадайте різницю між префіксним (<code>++a</code>) та постфіксним (<code>b++</code>) інкрементом.</em></p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">21</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 23: Тест 2 (Відповідь) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Розбір тесту 2: Відповідь</h2>
+            </div>
+            <div class="content">
+                <div class="box success-box" style="margin-bottom: 20px;">
+                    <h4 style="font-size: 1.4em; margin-bottom: 5px;">Результат виконання: <code>11 10 </code></h4>
+                </div>
+
+                <h3 class="section-title">Покроковий розбір:</h3>
+                <ul class="standard-list">
+                    <li>Статичні поля ініціалізуються послідовно: спочатку <code>а = 10</code>, потім <code>b = 10</code>.</li>
+                    <li><code>int c = ++a;</code> — <strong>префіксний інкремент</strong>: спочатку збільшує <code>a</code> на одиницю (стає 11), і записує 11 у змінну <code>c</code>.</li>
+                    <li><code>int cc = b++;</code> — <strong>постфіксний інкремент</strong>: спочатку передає поточне значення <code>b</code> (тобто 10) у змінну <code>cc</code>, а вже потім збільшує <code>b</code> до 11.</li>
+                </ul>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">22</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 24: Інтерактив -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Code Review: Знайдіть 3 помилки</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Уявіть, що цей код написав Junior-розробник. Де тут порушення архітектури та
+                    правил мови C#?</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class BankAccount
+{
+    public decimal Balance; 
+
+    public static decimal GlobalBonus = 100;
+
+    public static void AddBonus()
+    {
+        Balance += GlobalBonus; 
+    }
+
+    public decimal GetBonus()
+    {
+        return this.GlobalBonus; 
+    }
+}</code></pre>
+
+                <div class="box light-gray-bg push-down">
+                    <p style="font-size: 0.9em; color: var(--text-muted);"><em>Підказки: 1) Інкапсуляція. 2) Робота зі
+                            станом об'єкта в статичному методі. 3) Правила звернення до статичних полів.</em></p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">19</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 25: Висновки -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Висновки</h2>
+            </div>
+            <div class="content">
+                <div class="box full-width-box tight-box">
+                    <h4>Основні архітектурні правила</h4>
+                </div>
+
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">1. Захист стану (Інкапсуляція)</strong>
+                        <p class="metric-desc">Усі поля класу повинні бути закриті (<code>private</code>). Відкритий
+                            доступ до даних здійснюється виключно через публічні властивості.</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">2. Властивості та валідація</strong>
+                        <p class="metric-desc">Властивості (<code>get</code>/<code>set</code>) забезпечують контроль за
+                            даними, що надходять через змінну <code>value</code>. Авто-властивості є галузевим
+                            стандартом.</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">3. Незмінність об'єктів</strong>
+                        <p class="metric-desc">Використання модифікатора <code>init</code> дозволяє створити надійні
+                            об'єкти, стан яких неможливо змінити після завершення ініціалізації.</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">4. Правила статичності</strong>
+                        <p class="metric-desc"><code>static</code> застосовується для створення спільного контексту
+                            типу. У статичних методах немає доступу до ключового слова <code>this</code> та нестатичних
+                            членів.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">20</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn" disabled>Наступний →</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+    <!-- Ініціалізація підсвічування синтаксису -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+        });
+    </script>
+</body>
+
+</html>

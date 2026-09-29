@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лекція 7. Архітектура класів: зв'язки, наслідування та перетворення типів</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Підключення Highlight.js для красивого форматування коду -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tomorrow-night-blue.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="presentation-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="content title-slide-content">
+                <h1>Лекція 7. Архітектура класів: зв'язки (HAS-A, IS-A), перетворення типів та base</h1>
+                <p class="subtitle">Модуль 3. Об’єктно-орієнтоване програмування</p>
+                <div class="metadata">
+                    <p><strong>Курс:</strong> Об'єктно-орієнтовне програмування</p>
+                    <p><strong>Спеціальність:</strong> F3 Комп’ютерні науки</p>
+                    <p>Київський столичний університет імені Бориса Грінченка</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn" id="prevBtn" disabled>← Попередній</button>
+                <span class="slide-counter"><span class="current">1</span> / <span class="total">20</span></span>
+                <button class="btn" id="nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: План лекції -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>План лекції</h2>
+            </div>
+            <div class="content">
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">1. Мотивація: Автомобіль та Двигун</strong>
+                        <p class="metric-desc">Чому монолітні класи — це погано, і як об'єкт може стати полем іншого
+                            об'єкта.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">2. Принцип «HAS-A»: Асоціація, Агрегація, Композиція</strong>
+                        <p class="metric-desc">Аналіз різниці у силі зв'язків між об'єктами, UML-нотація та принцип
+                            делегування.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">3. Принцип «IS-A»: Наслідування</strong>
+                        <p class="metric-desc">Створення ієрархій класів (на прикладі годинників).</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">4. Перетворення типів (Casting)</strong>
+                        <p class="metric-desc">Висхідні та низхідні перетворення. Робота з оператором `is`.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">5. Захищений доступ та конструктори</strong>
+                        <p class="metric-desc">Модифікатор `protected`, порядок виклику конструкторів та ключове слово
+                            `base`.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">2</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Проблемна ситуація -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Мотивація: чому один клас — це погано?</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Спробуємо описати автомобіль в одному класі. Що станеться, якщо додати до нього
+                    характеристики двигуна?</p>
+                <div class="two-columns">
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class Car
+{
+    public string Model { get; set; }
+    
+    // Проблема: поля описують іншу сутність!
+    public string EngineType { get; set; }
+    public int EnginePower { get; set; }
+    public double EngineVolume { get; set; }
+    public bool EngineRunning { get; set; }
+
+    public void StartEngine()
+    {
+        EngineRunning = true;
+        Console.WriteLine($"{Model}: двигун запущено");
+    }
+}</code></pre>
+                    </div>
+                    <div class="box warning-box">
+                        <h4>Архітектурні проблеми</h4>
+                        <ul class="standard-list">
+                            <li><strong>Зростання класу:</strong> Додамо коробку передач, колеса, гальма — і отримаємо
+                                «Божественний об'єкт» (God Object).</li>
+                            <li><strong>Дублювання:</strong> Для створення мотоцикла доведеться переписувати всю логіку
+                                двигуна наново.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">3</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: Виділяємо клас Engine -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Рішення: Декомпозиція та об'єкт як поле</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Виносимо характеристики двигуна в окремий повноцінний клас <code>Engine</code>.
+                </p>
+                <div class="two-columns">
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class Engine
+{
+    public string Type { get; }
+    public int Power { get; }
+    public bool IsRunning { get; private set; }
+
+    public Engine(string type, int power)
+    {
+        Type = type;
+        Power = power;
+    }
+
+    public void Ignite()
+    {
+        IsRunning = true;
+        Console.WriteLine($"Двигун {Type} запущено");
+    }
+}</code></pre>
+                    </div>
+                    <div class="box light-blue-box">
+                        <h4 class="blue-text">Головна ідея</h4>
+                        <p>Тип поля класу може бути не лише базовим (<code>int</code>, <code>string</code>), а й
+                            <strong>іншим створеним вами класом</strong>.</p>
+                        <p style="margin-top: 10px;">Так формується відношення <strong>«HAS-A» (має у складі)</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">4</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 5: Три рівня зв'язку HAS-A -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Види зв'язку «HAS-A»</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">В об'єктно-орієнтованому проєктуванні відношення включення поділяють на три рівні
+                    за ступенем залежності об'єктів:</p>
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">1. Асоціація (Association)</strong>
+                        <p class="metric-desc">Слабкий зв'язок. Об'єкти просто взаємодіють (наприклад, <em>Водій</em> і
+                            <em>Автомобіль</em>), але існують повністю незалежно.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">2. Агрегація (Aggregation)</strong>
+                        <p class="metric-desc">Відношення «частина-ціле». Частина передається ззовні і може існувати
+                            окремо після знищення цілого (наприклад, <em>Автопарк</em> і <em>Автомобіль</em>).</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">3. Композиція (Composition)</strong>
+                        <p class="metric-desc">Жорстке відношення «частина-ціле». Ціле саме створює частину, і вона не
+                            може існувати без нього (наприклад, <em>Автомобіль</em> і <em>Двигун</em>).</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">5</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 6: Асоціація (UML та код) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Асоціація: UML-нотація та реалізація</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text"><strong>Асоціація</strong> — найслабший зв'язок, де об'єкти існують незалежно.</p>
+
+                <div class="two-columns">
+                    <div>
+                        <img src="pictures/association.png" alt="Асоціація UML"
+                            style="max-width: 100%; border-radius: 6px; border: 1px solid var(--border-light); margin-bottom: 10px;">
+                        <p style="font-size: 0.85em; color: var(--text-muted);">Суцільна лінія зі стрілкою: об'єкт
+                            передається як параметр у метод іншого.</p>
+                    </div>
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class Car
+{
+    public string Model { get; }
+    public Car(string model) => Model = model;
+    public void Move() => Console.WriteLine($"{Model} їде.");
+}
+
+class Driver
+{
+    public string Name { get; }
+    public Driver(string name) => Name = name;
+
+    // Асоціація: тимчасове використання
+    public void Drive(Car car)
+    {
+        Console.WriteLine($"{Name} керує {car.Model}");
+        car.Move();
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">6</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 7: Агрегація (UML та код) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Агрегація: UML-нотація та реалізація</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text"><strong>Агрегація</strong> — частина створюється ззовні і передається всередину.
+                </p>
+
+                <div class="two-columns">
+                    <div>
+                        <img src="pictures/aggregation.png" alt="Агрегація UML"
+                            style="max-width: 100%; border-radius: 6px; border: 1px solid var(--border-light); margin-bottom: 10px;">
+                        <p style="font-size: 0.85em; color: var(--text-muted);">Лінія з <strong>порожнім
+                                ромбом</strong>. Автомобіль може існувати без автопарку.</p>
+                    </div>
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class Fleet
+{
+    public string CompanyName { get; }
+    private Car companyCar; // Поле-посилання
+
+    // Агрегація: Car створюється ззовні
+    public Fleet(string name, Car car)
+    {
+        CompanyName = name;
+        this.companyCar = car; 
+    }
+
+    public void StartWork()
+    {
+        companyCar.Move();
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">7</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 8: Композиція -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Композиція (Composition): UML-нотація та код</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">При <strong>композиції</strong> цілий об'єкт сам створює компоненти через оператор
+                    <code>new</code>.</p>
+
+                <div class="two-columns">
+                    <div>
+                        <img src="pictures/composition.png" alt="Композиція UML"
+                            style="max-width: 100%; border-radius: 6px; border: 1px solid var(--border-light); margin-bottom: 8px;">
+                        <p style="font-size: 0.8em; color: var(--text-muted);">В UML позначається лінією із
+                            <strong>зафарбованим (чорним) ромбом</strong>.</p>
+                    </div>
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class Car
+{
+    public string Model { get; }
+    private Engine engine; // Сховане поле
+
+    public Car(string model, int power)
+    {
+        Model = model;
+        // Композиція: Car САМ створює Engine
+        this.engine = new Engine(power); 
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">8</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 9: Делегування -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Делегування та принцип «Чорного ящика»</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Маючи композицію, зовнішній об'єкт може передоручати (<strong>делегувати</strong>)
+                    виконання завдань своїм внутрішнім компонентам.</p>
+
+                <pre style="margin-top: 10px;"><code class="language-csharp">class Car
+{
+    public string Model { get; }
+    private Engine engine; 
+
+    public Car(string model, int power)
+    {
+        Model = model;
+        this.engine = new Engine(power);
+    }
+
+    // Делегування: Car не виконує запуск сам, а просить про це engine
+    public void Start()
+    {
+        Console.WriteLine($"{Model} готується до старту...");
+        engine.Ignite(); // Делегування виконання внутрішньому об'єкту
+    }
+}
+
+// У Main: Водій взаємодіє лише з автомобілем ("чорний ящик")
+Car myCar = new Car("Audi", 250);
+myCar.Start(); </code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">9</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 10: Принцип IS-A (Наслідування) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Принцип «IS-A» (Inheritance): Наслідування та UML</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Коли між класами існує відношення <strong>«є чимось»</strong> (наприклад, Собака
+                    <em>є</em> Твариною), використовують наслідування.</p>
+
+                <div class="two-columns">
+                    <div>
+                        <img src="pictures/Inheritance.png" alt="Наслідування UML"
+                            style="max-width: 100%; border-radius: 6px; border: 1px solid var(--border-light); margin-bottom: 8px;">
+                        <p style="font-size: 0.8em; color: var(--text-muted);">В UML наслідування позначається лінією з
+                            <strong>порожнім трикутником</strong>.</p>
+                    </div>
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">// Базовий клас (Superclass)
+class Animal
+{
+    public string Name { get; set; }
+    public void Eat() { Console.WriteLine("Їсть"); }
+}
+
+// Похідні класи (Subclasses)
+class Dog : Animal
+{
+    public void Bark() { Console.WriteLine("Гавкає"); }
+}
+
+class Cat : Animal
+{
+    public void Meow() { Console.WriteLine("Нявкає"); }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">10</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 11: Практика (Годинники) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Практичний приклад: Годинник і Точний годинник</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Класичний приклад ієрархії: клас <code>MyPreciseClock</code> успадковує
+                    <code>MyClock</code>, додаючи облік секунд до існуючих годин і хвилин.</p>
+
+                <div class="two-columns">
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">public class MyClock
+{
+    public int hours;
+    public int minutes;
+    
+    public void nextMinute()
+    {
+        minutes++;
+        if (minutes >= 60)
+        {
+            hours++;
+            minutes = 0;
+            if (hours >= 24) hours = 0;
+        }
+    }
+}</code></pre>
+                    </div>
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">// Похідний клас успадковує MyClock
+public class MyPreciseClock : MyClock
+{
+    public int seconds;
+
+    public void nextSecond()
+    {
+        seconds++;
+        if (seconds >= 60)
+        {
+            seconds = 0;
+            // Викликаємо метод базового класу!
+            nextMinute(); 
+        }
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">11</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 12: Upcasting -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Перетворення типів: Upcasting (Висхідне)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Об'єкти похідного типу (який знаходиться внизу ієрархії) одночасно представляють і
+                    базовий тип. Це природно, адже кожен точний годинник <em>є</em> годинником.</p>
+
+                <div class="box light-blue-box" style="margin-bottom: 15px;">
+                    <p>Висхідне перетворення (Upcasting) відбувається <strong>автоматично і безпечно</strong>.</p>
+                </div>
+
+                <pre style="margin-top: 0;"><code class="language-csharp">// Створюємо об'єкт дочірнього класу
+MyPreciseClock preciseClock = new MyPreciseClock();
+
+// Автоматичне висхідне перетворення (Upcasting) до базового типу
+MyClock clock = preciseClock; 
+
+// Через змінну 'clock' ми бачимо ЛИШЕ методи базового класу
+// (hours, minutes, nextMinute). Ми не маємо доступу до seconds, 
+// хоча в пам'яті це все ще той самий точний годинник!
+clock.nextMinute(); </code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">12</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 13: Downcasting -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Перетворення типів: Downcasting (Низхідне)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Низхідне перетворення (від базового типу до похідного) <strong>не виконується
+                        автоматично</strong>, оскільки не кожен базовий годинник є точним.</p>
+
+                <div class="two-columns">
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">MyClock simpleClock = new MyClock();
+
+// ❌ ПОМИЛКА КОМПІЛЯЦІЇ
+// MyPreciseClock pc1 = simpleClock; 
+
+// ❌ ПОМИЛКА ВИКОНАННЯ (InvalidCastException)
+// Ми примусово змушуємо компілятор повірити,
+// що це PreciseClock, хоча це не так.
+MyPreciseClock pc2 = (MyPreciseClock)simpleClock; 
+</code></pre>
+                    </div>
+                    <div class="box warning-box">
+                        <h4>⚠️ Небезпека Downcasting</h4>
+                        <p>Якщо виконати приведення несумісних типів, програма аварійно зупиниться з винятком
+                            <code>System.InvalidCastException</code>.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">13</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 14: Оператор is -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Безпечне перетворення: Оператор is</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Щоб запобігти помилці <code>InvalidCastException</code>, необхідно перевіряти
+                    фактичний тип об'єкта під час виконання програми за допомогою оператора
+                    <strong><code>is</code></strong>.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">MyClock someClock = GetClockFromSomewhere();
+
+// Перевіряємо, чи ДІЙСНО в цій змінній лежить об'єкт MyPreciseClock
+if (someClock is MyPreciseClock)
+{
+    // Тепер низхідне перетворення (Downcasting) абсолютно безпечне
+    MyPreciseClock precise = (MyPreciseClock)someClock;
+    
+    // Можемо працювати зі специфічними методами нащадка
+    precise.nextSecond();
+}
+else
+{
+    Console.WriteLine("Це звичайний годинник, він не має секунд.");
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">14</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 15: Модифікатор protected -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Інкапсуляція в ієрархії: protected</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Похідні класи успадковують усі члени базового класу, але не мають прямого доступу
+                    до його <code>private</code> полів. Для цього існує проміжний рівень доступу.</p>
+                <div class="two-columns">
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class Shape
+{
+    // protected доступний всередині класу 
+    // та у всіх класах-нащадках
+    protected double width;
+    protected double height;
+}
+
+class Rectangle : Shape
+{
+    public void SetSize(double w, double h)
+    {
+        width = w;  // ✅ Доступ дозволено нащадку
+        height = h;
+    }
+}</code></pre>
+                    </div>
+                    <div class="box bg-orange-light">
+                        <h4 class="orange-text">Рівні доступу</h4>
+                        <ul class="standard-list">
+                            <li><code>public</code> — доступно всім.</li>
+                            <li><code>protected</code> — доступно лише нащадкам і самому класу.</li>
+                            <li><code>private</code> — доступно лише всередині самого класу (нащадки не бачать).</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">15</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 16: Порядок виклику конструкторів -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Порядок виклику конструкторів</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">В ієрархії класів конструктори викликаються суворо <strong>від базового класу до
+                        похідного</strong> (згори донизу). Спочатку закладається фундамент!</p>
+
+                <div class="two-columns">
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class A
+{
+    public A() { Console.WriteLine("Конструктор А"); }
+}
+
+class B : A
+{
+    public B() { Console.WriteLine("Конструктор В"); }
+}
+
+class C : B
+{
+    public C() { Console.WriteLine("Конструктор С"); }
+}</code></pre>
+                    </div>
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">static void Main()
+{
+    // Створюємо об'єкт найнижчого класу
+    C obj = new C(); 
+}
+
+/* РЕЗУЛЬТАТ ВИКОНАННЯ:
+Конструктор А
+Конструктор В
+Конструктор С
+*/</code></pre>
+                        <div class="box light-blue-box tight-box" style="margin-top: 10px;">
+                            <p style="font-size: 0.9em;">Навіть без явної вказівки завжди викликається конструктор за
+                                замовчуванням (без параметрів) з базового класу.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">16</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 17: Ключове слово base (Конструктори) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Ключове слово base: Передача параметрів батьку</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Якщо конструктор базового класу вимагає параметри, похідний клас зобов'язаний
+                    передати їх за допомогою ключового слова <strong><code>base</code></strong>.</p>
+                <pre style="margin-top: 10px;"><code class="language-csharp">class Person
+{
+    public string Name { get; }
+    public Person(string name) { Name = name; } // Базовий конструктор
+}
+
+class Employee : Person
+{
+    public string Company { get; }
+
+    // Передаємо параметр name "нагору" у конструктор батька
+    public Employee(string name, string company) : base(name)
+    {
+        Company = company;
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">17</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 18: Використання base для методів -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Звернення до методів батька через base</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Ключове слово <code>base</code> також дозволяє викликати оригінальну реалізацію
+                    методу з базового класу, якщо похідний клас його перевизначає.</p>
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Person
+{
+    public virtual void GetInfo() { Console.WriteLine("Person Info"); }
+}
+
+class Employee : Person
+{
+    public override void GetInfo()
+    {
+        // Викликаємо оригінальний метод батьківського класу
+        base.GetInfo(); 
+        
+        // Додаємо специфічну логіку нащадка
+        Console.WriteLine("Employee Info");
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">18</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 19: Золоте правило архітектури -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Золоте правило архітектури ООП</h2>
+            </div>
+            <div class="content">
+                <div class="box primary-box" style="padding: 25px; text-align: center; margin-top: 20px;">
+                    <h3 style="font-size: 1.5em; margin-bottom: 15px; color: var(--primary-color);">"Favor composition
+                        over inheritance"</h3>
+                    <p style="font-size: 1.1em;"><strong>Надавай перевагу композиції перед наслідуванням.</strong></p>
+                </div>
+                <div class="two-columns push-down">
+                    <div class="box warning-box">
+                        <h4>Чому наслідування буває небезпечним?</h4>
+                        <p>Воно створює жорстку зв'язність між класами. Зміна базового класу може непередбачувано
+                            зламати всю ієрархію нащадків (проблема "крихкого базового класу").</p>
+                    </div>
+                    <div class="box success-box">
+                        <h4>Чому композиція краща?</h4>
+                        <p>Вона робить систему гнучкою, дозволяє легко підміняти компоненти «на льоту» та забезпечує
+                            надійну інкапсуляцію.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">19</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 20: Тест (Питання) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Практичний тест: Що виведе код?</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Проаналізуйте наведений фрагмент коду. Що з'явиться у консолі під час створення об'єкта <code>tesla</code>?</p>
+                
+<pre style="margin-top: 15px;"><code class="language-csharp">class Vehicle
+{
+    public Vehicle() { Console.Write("1"); }
+}
+
+class Car : Vehicle
+{
+    public Car() { Console.Write("2"); }
+}
+
+class ElectricCar : Car
+{
+    public ElectricCar() { Console.Write("3"); }
+}
+
+class Program
+{
+    static void Main()
+    {
+        ElectricCar tesla = new ElectricCar();
+    }
+}</code></pre>
+
+                <div class="box light-blue-box tight-box">
+                    <p><strong>Варіанти відповідей:</strong><br>
+                    А) <code>3</code><br>
+                    Б) <code>321</code><br>
+                    В) <code>123</code><br>
+                    Г) Помилка компіляції (відсутнє ключове слово base)</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">20</span> / <span class="total">22</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 21: Тест (Відповідь) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Розбір тесту: Відповідь</h2>
+            </div>
+            <div class="content">
+                <div class="box success-box" style="margin-bottom: 20px;">
+                    <h4 style="font-size: 1.4em; margin-bottom: 5px;">Правильна відповідь: В) <code>123</code></h4>
+                </div>
+
+                <h3 class="section-title">Покроковий розбір:</h3>
+                <ul class="standard-list">
+                    <li><strong>Правило фундаменту:</strong> В ієрархії класів конструктори завжди виконуються суворо від базового класу до найнижчого похідного.</li>
+                    <li>Спочатку викликається конструктор найвищого предка <code>Vehicle</code> (виводить <strong>1</strong>).</li>
+                    <li>Потім відпрацьовує конструктор проміжного класу <code>Car</code> (виводить <strong>2</strong>).</li>
+                    <li>І лише наприкінці виконується код конструктора самого <code>ElectricCar</code> (виводить <strong>3</strong>).</li>
+                    <li><em>Примітка до варіанту Г:</em> Ключове слово <code>base</code> тут не є обов'язковим, оскільки компілятор автоматично викликає конструктори без параметрів.</li>
+                </ul>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">21</span> / <span class="total">22</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 22: Висновки -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Висновки</h2>
+            </div>
+            <div class="content">
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">1. Архітектурна декомпозиція</strong>
+                        <p class="metric-desc">Складні системи проєктуються через розбиття монолітних класів на менші
+                            сутності та налаштування зв'язків між ними.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">2. Ієрархія зв'язків «HAS-A»</strong>
+                        <p class="metric-desc">Асоціація (слабкий зв'язок), Агрегація (передача частини ззовні) та
+                            Композиція (створення частини всередині через <code>new</code>).</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">3. Принцип «IS-A» (Наслідування)</strong>
+                        <p class="metric-desc">Дозволяє будувати ієрархії, створюючи спеціалізовані класи на основі
+                            базових, розширюючи їх функціонал та уникаючи дублювання коду.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">4. Перетворення типів (Casting)</strong>
+                        <p class="metric-desc">Висхідне перетворення (Upcasting) є природним і безпечним, тоді як
+                            низхідне (Downcasting) вимагає обов'язкової перевірки оператором <code>is</code>.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">5. Контроль доступу та ініціалізації</strong>
+                        <p class="metric-desc">Модифікатор <code>protected</code> відкриває дані лише для нащадків, а
+                            ключове слово <code>base</code> гарантує правильний виклик конструкторів.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">20</span> / <span class="total">20</span></span>
+                <button class="btn nextBtn" disabled>Наступний →</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+
+    <!-- Ініціалізація підсвічування синтаксису -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+        });
+    </script>
+</body>
+
+</html>
