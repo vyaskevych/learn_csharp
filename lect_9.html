@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лекція 9. Контракти: інтерфейси, абстрактні класи, поліморфізм</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Підключення Highlight.js для красивого форматування коду -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tomorrow-night-blue.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="presentation-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="content title-slide-content">
+                <h1>Лекція 9. Контракти: абстрактні класи, інтерфейси та динамічний поліморфізм</h1>
+                <p class="subtitle">Модуль 3. Об’єктно-орієнтоване програмування</p>
+                <div class="metadata">
+                    <p><strong>Курс:</strong> Об'єктно-орієнтовне програмування</p>
+                    <p><strong>Спеціальність:</strong> F3 Комп’ютерні науки</p>
+                    <p>Київський столичний університет імені Бориса Грінченка</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn" disabled>← Попередній</button>
+                <span class="slide-counter"><span class="current">1</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: План лекції -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>План лекції</h2>
+            </div>
+            <div class="content">
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">1. Поліморфізм та його види</strong>
+                        <p class="metric-desc">Визначення. Статичний поліморфізм (перевантаження) vs Динамічний
+                            поліморфізм (перевизначення).</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">2. Проблема жорсткої прив'язки типів</strong>
+                        <p class="metric-desc">Антипатерн if-else та як динамічний поліморфізм вирішує цю архітектурну
+                            проблему.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">3. Абстрактні класи</strong>
+                        <p class="metric-desc">Заборона інстанціювання базових концепцій. Модифікатор `abstract`.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">4. Інтерфейси (Контракти поведінки)</strong>
+                        <p class="metric-desc">Відношення CAN-DO. Вирішення проблеми множинного успадкування.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">5. Явна реалізація та Системні контракти</strong>
+                        <p class="metric-desc">Усунення колізій імен. Інтерфейс IComparable&lt;T&gt; для сортування.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">2</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Визначення поліморфізму -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Що таке поліморфізм?</h2>
+            </div>
+            <div class="content">
+                <div class="box primary-box">
+                    <h4>Визначення</h4>
+                    <p><strong>Поліморфізм</strong> (від грец. poly — багато, morph — форма) — це принцип ООП, який
+                        дозволяє сутностям (змінним, функціям або об'єктам) мати різні форми або по-різному
+                        реалізовувати одну й ту саму дію.</p>
+                </div>
+
+                <div class="two-columns push-down">
+                    <div class="box light-blue-box">
+                        <h4 class="blue-text">1. Статичний (Раннє зв'язування)</h4>
+                        <p>Вирішується компілятором <strong>до запуску</strong> програми.</p>
+                        <p>Реалізується через <em>перевантаження методів</em>: методи мають однакове ім'я, але різну
+                            кількість або типи параметрів.</p>
+                    </div>
+                    <div class="box light-orange-box">
+                        <h4 class="orange-text">2. Динамічний (Пізнє зв'язування)</h4>
+                        <p>Вирішується середовищем виконання (CLR) <strong>під час роботи</strong> програми.</p>
+                        <p>Реалізується через <em>перевизначення методів</em>: об'єкти-нащадки змінюють логіку методів
+                            базового класу.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">3</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: Статичний поліморфізм -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Статичний поліморфізм (Перевантаження)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Наочний приклад статичного поліморфізму: один метод, але з різними "формами"
+                    прийняття даних.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Printer
+{
+    // Форма 1: друкує ціле число
+    public void Print(int number) 
+    {
+        Console.WriteLine($"Друк числа: {number}");
+    }
+
+    // Форма 2: друкує рядок
+    public void Print(string text) 
+    {
+        Console.WriteLine($"Друк тексту: {text}");
+    }
+}
+
+// Використання (компілятор одразу знає, який метод викликати):
+Printer p = new Printer();
+p.Print(100);       // Викличе Форму 1
+p.Print("Hello");   // Викличе Форму 2</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">4</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 5: Проблема if-else -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Проблема: Антипатерн перевірки типів</h2>
+            </div>
+            <div class="content">
+                <div class="box full-width-box tight-box" style="margin-bottom: 15px;">
+                    <p>Уявімо розробку системи сповіщень. У нас є незалежні класи з різними методами. Якщо <strong>не
+                            використовувати</strong> динамічний поліморфізм для їх об'єднання, розробники часто пишуть
+                        жахливі конструкції з перевіркою типів (оператор <code>is</code>).</p>
+                </div>
+
+                <pre style="margin-top: 0;"><code class="language-csharp">// 1. Існуючі незалежні класи (не мають спільного предка)
+class EmailNotifier { 
+    public void SendEmailMessage() { /* Логіка пошти */ } 
+}
+class TelegramNotifier { 
+    public void SendTelegramBot() { /* Логіка Telegram */ } 
+}
+
+class SystemController
+{
+    // 2. Намагаємося обробити їх єдиним списком об'єктів (object)
+    public void SendAllNotifications(object[] notifiers)
+    {
+        foreach (var notifier in notifiers)
+        {
+            // Жорстка прив'язка: перевіряємо тип і викликаємо специфічний метод
+            if (notifier is EmailNotifier)
+            {
+                ((EmailNotifier)notifier).SendEmailMessage();
+            }
+            else if (notifier is TelegramNotifier)
+            {
+                ((TelegramNotifier)notifier).SendTelegramBot();
+            }
+            // А що, якщо завтра бізнес попросить додати SMS? Доведеться переписувати цей цикл!
+        }
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">5</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 6: Чому це погано -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Чому такий підхід руйнує архітектуру?</h2>
+            </div>
+            <div class="content">
+                <div class="box warning-box" style="margin-bottom: 20px;">
+                    <h4>Порушення OCP (Open-Closed Principle)</h4>
+                    <p>Система має бути <strong>відкритою для розширення</strong> (додавання нових функцій), але
+                        <strong>закритою для модифікації</strong> (зміни старого робочого коду).
+                    </p>
+                </div>
+
+                <ul class="standard-list">
+                    <li><strong>Крихкість:</strong> Кожного разу, коли з'являється новий канал зв'язку (Viber, SMS,
+                        Push), розробник мусить знаходити <em>всі</em> подібні цикли в системі та додавати нові гілки
+                        <code>else if</code>.
+                    </li>
+                    <li><strong>Ризик помилок:</strong> Якщо розробник забуде оновити хоча б один такий цикл, новий тип
+                        сповіщень просто проігнорується.</li>
+                    <li><strong>Висока зв'язність:</strong> Клас <code>SystemController</code> змушений "знати" про
+                        існування всіх конкретних класів сповіщень.</li>
+                </ul>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">6</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 7: Рішення -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Рішення: Динамічний поліморфізм</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Замість того, щоб <em>система</em> перевіряла тип об'єкта, ми просто наказуємо
+                    об'єкту виконати дію. А як саме її виконати — <strong>об'єкт вирішує сам</strong>.</p>
+
+                <div class="two-columns push-down">
+                    <div class="box bg-orange-light">
+                        <h4 class="orange-text">virtual (у базовому класі)</h4>
+                        <p>Створює "точку розширення". Дозволяє (але не зобов'язує) змінити поведінку методу в
+                            класах-спадкоємцях.</p>
+                    </div>
+                    <div class="box bg-red-light" style="border-left-color: #2E7D32; background: #e8f5e9;">
+                        <h4 style="color: #2E7D32;">override (у класі-нащадку)</h4>
+                        <p>Явно вказує компілятору: "Я перевизначаю логіку базового методу власною реалізацією".</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">7</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 8: Повний приклад: Базовий та дочірні класи -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Повний приклад (Крок 1: Архітектура)</h2>
+            </div>
+            <div class="content">
+                <pre style="margin-top: 0;"><code class="language-csharp">// 1. Базовий клас створює універсальний контракт (метод Send)
+public class Notifier
+{
+    public virtual void Send(string msg) 
+    {
+        Console.WriteLine($"Базове системне сповіщення: {msg}");
+    }
+}
+
+// 2. Нащадок 1: Реалізує відправку по Email
+public class EmailNotifier : Notifier
+{
+    public override void Send(string msg) 
+    {
+        Console.WriteLine($"[EMAIL] Відправка листа на сервер: {msg}");
+    }
+}
+
+// 3. Нащадок 2: Реалізує відправку в Telegram
+public class TelegramNotifier : Notifier
+{
+    public override void Send(string msg) 
+    {
+        Console.WriteLine($"[TELEGRAM] Виклик API бота: {msg}");
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">8</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 9: Повний приклад: Використання -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Повний приклад (Крок 2: Використання)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Тепер нам не потрібні конструкції <code>if-else</code>. Магія поліморфізму в тому,
+                    що середовище виконання (CLR) самостійно викличе потрібний <code>override</code> метод.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Program
+{
+    static void Main()
+    {
+        // Групуємо об'єкти під посиланням їхнього базового типу
+        Notifier[] notifiers = new Notifier[] 
+        { 
+            new EmailNotifier(), 
+            new TelegramNotifier(),
+            new Notifier() // Навіть базовий клас спрацює коректно
+        };
+
+        // Цей код ідеальний. Він ЗАКРИТИЙ для змін.
+        foreach (Notifier item in notifiers)
+        {
+            item.Send("Успішний вхід!"); 
+        }
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">9</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 10: Результат -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Тріумф архітектури</h2>
+            </div>
+            <div class="content">
+                <div class="box success-box" style="margin-bottom: 20px;">
+                    <h4>Результат роботи програми:</h4>
+                    <pre
+                        style="background: none; border: none; padding: 0; margin: 10px 0; color: #155724; font-weight: bold; font-family: monospace;">[EMAIL] Відправка листа на сервер: Успішний вхід!
+[TELEGRAM] Виклик API бота: Успішний вхід!
+Базове системне сповіщення: Успішний вхід!</pre>
+                </div>
+
+                <div class="box light-gray-bg push-down">
+                    <p>Якщо завтра з'явиться <code>SmsNotifier</code>, вам потрібно буде лише:</p>
+                    <ol>
+                        <li>Створити новий клас <code>SmsNotifier : Notifier</code>.</li>
+                        <li>Написати <code>override void Send()</code>.</li>
+                        <li>Додати його у масив.</li>
+                    </ol>
+                    <p><strong>Головний цикл відправки не зміниться на жоден символ!</strong> Це і є професійне
+                        використання поліморфізму.</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">10</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 11: Проблема базового класу -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Проблема базового класу</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Наш <code>Notifier</code> вирішив проблему поліморфізму, але створив іншу. З точки
+                    зору бізнес-логіки, об'єкта "просто сповіщення" в реальному світі не існує. Воно має бути конкретним
+                    (Email, SMS).</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">public class Shape 
+{
+    // Що саме має малювати цей метод? У просто "фігури" немає форми!
+    public virtual void Draw() 
+    { 
+        Console.WriteLine("Малюю... незрозуміло що.");
+    }
+}
+
+// Проблема 1: Ми можемо створити об'єкт-привид
+Shape ghost = new Shape();
+ghost.Draw(); 
+
+// Проблема 2: Метод virtual ДОЗВОЛЯЄ перевизначення, але НЕ ВИМАГАЄ його.
+// Програміст може створити клас Circle і забути написати override.</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">11</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 12: Абстрактні класи -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Рішення: Абстрактні класи</h2>
+            </div>
+            <div class="content">
+                <div class="box primary-box" style="margin-bottom: 20px;">
+                    <p><strong>Абстрактний клас</strong> (ключове слово <code>abstract</code>)
+                        — це концептуальний шаблон або "креслення". Створити прямий екземпляр (об'єкт) абстрактного
+                        класу неможливо.</p>
+                </div>
+
+                <ul class="standard-list">
+                    <li>Створюються виключно для того, щоб бути <strong>базовими класами</strong> для інших.</li>
+                    <li>Можуть містити як звичайні методи (зі спільною логікою), так і <em>абстрактні методи</em>.</li>
+                    <li><strong>Заборона:</strong> <code>Shape s = new Shape();</code> викличе помилку компіляції.</li>
+                </ul>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">12</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 13: Абстрактні методи -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Абстрактні методи</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Абстрактний метод — це вимога. Він оголошується без тіла (замість фігурних дужок
+                    ставиться крапка з комою) і діє як строгий контракт для нащадків.</p>
+
+                <div class="two-columns push-down">
+                    <div class="box warning-box">
+                        <h4>Правила:</h4>
+                        <ol>
+                            <li>Будь-який клас-нащадок <strong>зобов'язаний</strong> реалізувати абстрактний метод
+                                (через <code>override</code>). Інакше код не скомпілюється.</li>
+                            <li>Якщо клас має хоча б один абстрактний метод, сам клас теж <strong>мусить</strong> бути
+                                оголошений як <code>abstract</code>.</li>
+                            <li>Абстрактні методи не можуть бути <code>private</code>.</li>
+                        </ol>
+                    </div>
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">public abstract class Shape
+{
+    // Абстрактний метод: тіла немає!
+    public abstract void Draw(); 
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">13</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 14: Приклад абстрактного класу -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Повний приклад абстрактного класу</h2>
+            </div>
+            <div class="content">
+                <pre style="margin-top: 0;"><code class="language-csharp">public abstract class Shape
+{
+    // Абстрактні класи можуть мати поля та звичайні властивості
+    public string Color { get; set; } 
+
+    public Shape(string color) { Color = color; }
+
+    // Звичайний метод (допускається)
+    public void PrintColor() => Console.WriteLine($"Колір: {Color}");
+
+    // АБСТРАКТНИЙ МЕТОД (строгий контракт)
+    public abstract double GetArea(); 
+}
+
+public class Circle : Shape
+{
+    public double Radius { get; set; }
+
+    public Circle(string color, double r) : base(color) { Radius = r; }
+
+    // ЯКЩО НЕ НАПИСАТИ ЦЕЙ МЕТОД - БУДЕ ПОМИЛКА КОМПІЛЯЦІЇ
+    public override double GetArea() 
+    {
+        return Math.PI * Radius * Radius;
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">14</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 15: Обмеження успадкування (Проблема ромба) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Чому C# забороняє множинне успадкування?</h2>
+            </div>
+            <div class="content">
+                <div class="box warning-box" style="margin-bottom: 15px;">
+                    <h4>Проблема ромба (Diamond Problem)</h4>
+                    <p>Уявіть, що C# дозволяв би класу мати кілька базових класів-батьків. Що станеться, якщо обидва
+                        батьки мають метод з однаковим іменем, але різною логікою?</p>
+                </div>
+
+                <div class="two-columns">
+                    <div>
+                        <pre style="margin-top: 0;"><code class="language-csharp">class Machine { 
+    public virtual void Move() => Console.WriteLine("Їде на колесах"); 
+}
+
+class Bird { 
+    public virtual void Move() => Console.WriteLine("Махає крилами"); 
+}
+
+// ГІПОТЕТИЧНИЙ КОД (В C# ЦЕ ПОМИЛКА КОМПІЛЯЦІЇ):
+class Drone : Machine, Bird 
+{
+    // Дрон успадкував обидва класи
+}
+
+Drone myDrone = new Drone();
+myDrone.Move(); // 💥 КРАШ! ЧИЙ МЕТОД ВИКЛИКАТИ?</code></pre>
+                    </div>
+                    <div>
+                        <ul class="standard-list" style="margin-top: 0;">
+                            <li><strong>Фатальна неоднозначність:</strong> Компілятор фізично не здатний вирішити, чию
+                                саме реалізацію методу <code>Move()</code> треба виконати — <code>Machine</code> чи
+                                <code>Bird</code>.</li>
+                            <li><strong>Архітектурний хаос:</strong> Чим глибша ієрархія класів, тим більше таких
+                                нерозв'язних конфліктів виникає.</li>
+                            <li><strong>Рішення C#:</strong> Клас може мати <strong>ТІЛЬКИ ОДНОГО</strong> батька
+                                (сувора ієрархія <em>IS-A</em>). А для об'єднання різних ролей і поведінок
+                                (<em>CAN-DO</em>) існують <strong>Інтерфейси</strong>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">15</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 16: Інтерфейси -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Інтерфейси: Контракти поведінки</h2>
+            </div>
+            <div class="content">
+                <div class="box primary-box" style="margin-bottom: 20px;">
+                    <p><strong>Інтерфейс</strong> (<code>interface</code>) — це структура, яка містить лише оголошення
+                        методів та властивостей (без їх реалізації). Якщо клас (IS-A) визначає, <em>чим є об'єкт</em>,
+                        то інтерфейс (CAN-DO) визначає, <em>що він вміє робити</em>.</p>
+                </div>
+
+                <ul class="standard-list">
+                    <li><strong>Конвенція:</strong> Імена завжди починаються з великої <code>I</code> (наприклад,
+                        <code>IFlyable</code>, <code>IPrinter</code>).
+                    </li>
+                    <li>Клас може реалізовувати <strong>безліч</strong> інтерфейсів одночасно.</li>
+                    <li>Усі члени інтерфейсу за замовчуванням є <code>public</code>. Писати модифікатори доступу
+                        всередині заборонено.</li>
+                </ul>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">16</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 17: Приклад Інтерфейсу -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Приклад реалізації інтерфейсу</h2>
+            </div>
+            <div class="content">
+                <pre style="margin-top: 0;"><code class="language-csharp">// Оголошення контракту поведінки (без реалізації)
+public interface IFlyable
+{
+    void TakeOff();
+    int MaxAltitude { get; }
+}
+
+// Птах успадковується від тварини, але ВМІЄ літати
+public class Bird : Animal, IFlyable
+{
+    // Обов'язкова реалізація контракту
+    public int MaxAltitude => 500;
+    public void TakeOff() => Console.WriteLine("Птах махає крилами.");
+}
+
+// Дрон успадковується від машини, але ТЕЖ ВМІЄ літати
+public class Drone : Machine, IFlyable
+{
+    // Реалізація того ж самого контракту, але іншим чином
+    public int MaxAltitude => 3000;
+    public void TakeOff() => Console.WriteLine("Дрон запускає пропелери.");
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">17</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 18: Поліморфізм через інтерфейси -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Поліморфізм через інтерфейси</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Ми можемо об'єднувати абсолютно неспоріднені класи в масиви чи колекції,
+                    орієнтуючись лише на те, який контракт вони підписали.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">class Program
+{
+    static void Main()
+    {
+        // Біологія та Електроніка в одному масиві!
+        IFlyable[] skyObjects = new IFlyable[] 
+        { 
+            new Bird(), 
+            new Drone() 
+        };
+
+        foreach (var obj in skyObjects)
+        {
+            // Нам неважливо, хто це. Головне, що воно має метод TakeOff()
+            obj.TakeOff(); 
+            Console.WriteLine($"Ліміт висоти: {obj.MaxAltitude}м");
+        }
+    }
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">18</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 19: Колізія імен -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Колізія імен: Явна реалізація</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Оскільки клас може реалізовувати багато інтерфейсів, виникає проблема: що, якщо
+                    два інтерфейси вимагають метод з абсолютно однаковим іменем?</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">public interface ISchool { void Study(); }
+public interface IUniversity { void Study(); }
+
+public class Student : ISchool, IUniversity
+{
+    // Неявна (звичайна) реалізація:
+    // ОДИН метод обслуговує ОДРАЗУ ДВА інтерфейси.
+    public void Study()
+    {
+        Console.WriteLine("Я просто навчаюсь...");
+    }
+}</code></pre>
+
+                <div class="box light-blue-box tight-box">
+                    <p>А якщо бізнес-логіка вимагає, щоб поведінка у школі та університеті кардинально відрізнялася?</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">19</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 20: Явна реалізація (Explicit Implementation) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Явна реалізація (Explicit Implementation)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Для розділення логіки використовують явну реалізацію: перед іменем методу пишуть
+                    назву інтерфейсу. При цьому <strong>заборонено використовувати `public`</strong>.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">public class Student : ISchool, IUniversity
+{
+    // Явна реалізація (прихована від об'єкта)
+    void ISchool.Study() => Console.WriteLine("Вчу шкільну програму.");
+    void IUniversity.Study() => Console.WriteLine("Слухаю лекції в універі.");
+}
+
+// ВИКОРИСТАННЯ:
+Student s = new Student();
+// s.Study(); // ❌ ПОМИЛКА! Метод прихований з відкритого API.
+
+// Щоб викликати метод, треба привести об'єкт до конкретного інтерфейсу:
+((ISchool)s).Study();     // Викличе шкільний метод
+((IUniversity)s).Study(); // Викличе університетський метод</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">20</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 21: Системні контракти -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Системні контракти: IComparable&lt;T&gt;</h2>
+            </div>
+            <div class="content">
+                <div class="box warning-box" style="margin-bottom: 20px;">
+                    <h4>Проблема сортування користувацьких об'єктів</h4>
+                    <p>Стандартний алгоритм <code>Array.Sort()</code> не знає, як сортувати об'єкти вашого класу
+                        <code>Product</code>. Що порівнювати: ціну чи назву? Виклик сортування призведе до крашу
+                        програми.
+                    </p>
+                </div>
+
+                <p class="intro-text"><strong>Рішення:</strong> Щоб "навчити" ваш клас взаємодіяти зі стандартними
+                    механізмами C#, він має підписати системний контракт — інтерфейс <code>IComparable&lt;T&gt;</code>.
+                </p>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">21</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 22: Реалізація IComparable -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Реалізація CompareTo</h2>
+            </div>
+            <div class="content">
+                <pre style="margin-top: 0;"><code class="language-csharp">public class Product : IComparable&lt;Product&gt; // Вказуємо з ким будемо порівнювати
+{
+    public string Name { get; set; }
+    public int Price { get; set; }
+
+    // Метод має повернути: <0 (менше), 0 (рівні), >0 (більше)
+    public int CompareTo(Product other)
+    {
+        if (other == null) return 1;
+
+        // Делегуємо порівняння вбудованим типам C#
+        return this.Price.CompareTo(other.Price); 
+    }
+}
+
+// ТЕПЕР ЦЕ ПРАЦЮВАТИМЕ:
+List&lt;Product&gt; list = new List&lt;Product&gt;();
+// ... наповнення списку ...
+list.Sort(); // CLR знайде інтерфейс і відсортує за ціною!</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">22</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 23: Дефолтні методи інтерфейсів -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Сучасні фічі: Дефолтні методи (C# 8.0)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Раніше інтерфейси не могли містити жодного рядка логіки. У C# 8.0 додали
+                    можливість писати <strong>реалізацію методів за замовчуванням (Default Interface Methods)</strong>.
+                </p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">public interface ILogger
+{
+    void LogError(string msg); // Обов'язково реалізувати
+    
+    // Метод із тілом ПРЯМО В ІНТЕРФЕЙСІ!
+    void LogInfo(string msg) 
+    {
+        Console.WriteLine($"[INFO]: {msg}");
+    }
+}</code></pre>
+
+                <div class="box light-gray-bg push-down">
+                    <p><strong>Навіщо це?</strong> Щоб дозволити розробникам бібліотек додавати нові методи у старі
+                        інтерфейси, не ламаючи при цьому існуючий код клієнтів. Якщо клієнт не реалізує метод сам —
+                        спрацює дефолтний.</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">23</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 24: Висновки -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Висновки</h2>
+            </div>
+            <div class="content">
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">Поліморфізм як фундамент (virtual/override)</strong>
+                        <p class="metric-desc">Замінює крихкі конструкції if-else на динамічне пізнє зв'язування. Робить
+                            архітектуру гнучкою та відкритою для нових фіч.</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">Абстракція (abstract)</strong>
+                        <p class="metric-desc">Креслення для споріднених типів. Забороняє створення екземплярів базової
+                            логіки та жорстко вимагає від нащадків реалізації ключових методів.</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">Інтерфейси (interface)</strong>
+                        <p class="metric-desc">Контракти поведінки (CAN-DO). На відміну від класів, об'єкт може
+                            підписати необмежену кількість інтерфейсів.</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">Явна реалізація</strong>
+                        <p class="metric-desc">Потужний інструмент для вирішення колізій імен та приховування службових
+                            методів (як-от системні контракти) від публічного API.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">24</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn" disabled>Наступний →</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Стандартне підключення зовнішнього скрипта -->
+    <script src="script.js"></script>
+
+    <!-- Ініціалізація підсвічування синтаксису -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+        });
+    </script>
+</body>
+
+</html>
