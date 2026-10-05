@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лекція 10. Декларативна обробка: основи LINQ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Підключення Highlight.js для красивого форматування коду -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tomorrow-night-blue.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+</head>
+
+<body>
+    <div class="presentation-container">
+
+        <!-- Slide 1: Title -->
+        <div class="slide active">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="content title-slide-content">
+                <h1>Лекція 10. Декларативна обробка: основи LINQ (синтаксис методів розширення)</h1>
+                <p class="subtitle">Модуль 4. Розширена робота з даними</p>
+                <div class="metadata">
+                    <p><strong>Курс:</strong> Об'єктно-орієнтовне програмування</p>
+                    <p><strong>Спеціальність:</strong> 122 Комп’ютерні науки</p>
+                    <p>Київський столичний університет імені Бориса Грінченка</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn" disabled>← Попередній</button>
+                <span class="slide-counter"><span class="current">1</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 2: План лекції -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>План лекції</h2>
+            </div>
+            <div class="content">
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">1. Імперативний та декларативний підходи</strong>
+                        <p class="metric-desc">Як і навіщо змінювати стиль мислення в програмуванні.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">2. Вступ до LINQ</strong>
+                        <p class="metric-desc">Призначення, інтерфейси IEnumerable&lt;T&gt; та види синтаксису.</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">3. Базові механізми</strong>
+                        <p class="metric-desc">Методи розширення (this), лямбда-вирази (=&gt;) та системні делегати
+                            (Func).</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">4. Відкладене виконання та Матеріалізація</strong>
+                        <p class="metric-desc">Різниця між формуванням запиту та його виконанням (ToList).</p>
+                    </div>
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">5. Групи методів та Побудова ланцюжків</strong>
+                        <p class="metric-desc">Фільтрація, сортування, агрегація та оптимізація запитів (Fluent API).
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">2</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 3: Парадигми -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Імперативний та декларативний підходи</h2>
+            </div>
+            <div class="content">
+                <div class="box primary-box">
+                    <p>Фундаментальні парадигми написання коду кардинально відрізняються за способом мислення
+                        розробника.</p>
+                </div>
+
+                <div class="two-columns push-down">
+                    <div class="box light-blue-box">
+                        <h4 class="blue-text">Імперативний підхід</h4>
+                        <p>Відповідає на запитання <strong>«ЯК це зробити?»</strong>.</p>
+                        <p>Розробник детально описує кожен крок: як ітерувати колекцію, де зберігати проміжні
+                            результати, як змінювати стан. Використовує цикли (<code>for</code>) та умовні конструкції
+                            (<code>if</code>).</p>
+                    </div>
+                    <div class="box light-orange-box">
+                        <h4 class="orange-text">Декларативний підхід</h4>
+                        <p>Відповідає на запитання <strong>«ЩО потрібно отримати?»</strong>.</p>
+                        <p>Описує бажаний результат, приховуючи внутрішню механіку (перебір, виділення пам'яті) під
+                            капотом бібліотеки. <strong>LINQ</strong> є представником цього стилю.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">3</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 4: Імперативний код -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Приклад: Імперативний код</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Завдання: з масиву чисел вибрати всі парні числа і зберегти їх у новий список.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">List&lt;int&gt; numbers = new List&lt;int&gt; { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+List&lt;int&gt; evenNumbers = new List&lt;int&gt;();
+
+// Імперативний підхід: крок за кроком описуємо процес
+foreach (int number in numbers)
+{
+    if (number % 2 == 0) // Перевірка умови
+    {
+        // Зміна стану зовнішньої колекції
+        evenNumbers.Add(number); 
+    }
+}</code></pre>
+                <div class="box warning-box" style="margin-top: 15px;">
+                    <p><strong>Недоліки:</strong> Код громіздкий, вимагає ручного керування колекціями, підвищує ризик
+                        помилок (side effects).</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">4</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 5: Декларативний код -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Приклад: Декларативний код (LINQ)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Те ж саме завдання за допомогою декларативного підходу виглядає лаконічно і
+                    читається як звичайна англійська мова.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">using System.Linq; // Обов'язково підключаємо простір імен
+
+List&lt;int&gt; numbers = new List&lt;int&gt; { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+// Декларативний підхід: описуємо намір 
+// (Where - де число парне, ToList - перетворити на список)
+var evenNumbers = numbers.Where(n =&gt; n % 2 == 0).ToList();</code></pre>
+
+                <div class="box success-box" style="margin-top: 15px;">
+                    <h4>Переваги:</h4>
+                    <p>Висока читабельність, лаконічність (один рядок замість семи), відсутність ручної мутації даних
+                        (менше побічних ефектів).</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">5</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 6: Вступ до LINQ -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Що таке LINQ?</h2>
+            </div>
+            <div class="content">
+                <div class="box primary-box" style="margin-bottom: 20px;">
+                    <p><strong>LINQ (Language Integrated Query)</strong> — це технологія в .NET, яка додає можливості
+                        виконання запитів до даних безпосередньо до синтаксису мови C#.</p>
+                </div>
+
+                <h4>Ключові інтерфейси LINQ:</h4>
+                <ul class="standard-list">
+                    <li><strong><code>IEnumerable&lt;T&gt;</code></strong> — використовується для запитів до колекцій,
+                        що вже знаходяться в <em>оперативній пам'яті</em> (масиви, списки). Це LINQ to Objects.</li>
+                    <li><strong><code>IQueryable&lt;T&gt;</code></strong> — використовується для запитів до
+                        <em>зовнішніх джерел даних</em> (баз даних). Дозволяє транслювати C# код у SQL-запити.</li>
+                </ul>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">6</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 7: Види синтаксису -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Два види синтаксису LINQ</h2>
+            </div>
+            <div class="content">
+                <div class="two-columns push-down">
+                    <div class="box bg-orange-light">
+                        <h4 class="orange-text">1. Синтаксис запитів (Query Syntax)</h4>
+                        <p>Схожий на SQL. Зручний для складних запитів з <code>join</code> та <code>group by</code>.</p>
+                        <pre style="margin-top: 10px;"><code class="language-csharp">var query = 
+    from num in numbers
+    where num &gt; 5
+    orderby num ascending
+    select num;</code></pre>
+                    </div>
+                    <div class="box bg-red-light" style="border-left-color: #2E7D32; background: #e8f5e9;">
+                        <h4 style="color: #2E7D32;">2. Синтаксис методів (Method Syntax)</h4>
+                        <p>Базується на методах розширення та лямбдах. Сучасний та лаконічний.</p>
+                        <pre style="margin-top: 10px;"><code class="language-csharp">var method = numbers
+    .Where(num =&gt; num &gt; 5)
+    .OrderBy(num =&gt; num);</code></pre>
+                    </div>
+                </div>
+                <div class="box light-gray-bg" style="margin-top: 15px;">
+                    <p><strong>Важливо:</strong> У сучасному комерційному коді домінує <strong>синтаксис
+                            методів</strong>. Він гнучкіший і підтримує методи, яких немає у Query Syntax (наприклад,
+                        <code>Count()</code>, <code>Take()</code>).</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">7</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 8: Базові механізми (Методи розширення) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Базові механізми: Методи розширення</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text"><strong>Методи розширення</strong> дозволяють додавати нові методи до існуючих
+                    типів без зміни їх коду. LINQ — це набір методів розширення для <code>IEnumerable&lt;T&gt;</code>.
+                </p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">public static class StringExtensions
+{
+    // Метод розширення: ключове слово this перед першим параметром
+    public static bool IsCapitalized(this string str)
+    {
+        if (string.IsNullOrEmpty(str)) return false;
+        return char.IsUpper(str[0]);
+    }
+}
+
+// ВИКОРИСТАННЯ (виглядає як вбудований метод):
+string city = "Kyiv";
+bool check = city.IsCapitalized(); // true</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">8</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 9: Базові механізми (Лямбди) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Лямбда-вирази та Делегати</h2>
+            </div>
+            <div class="content">
+                <div class="box primary-box" style="margin-bottom: 15px;">
+                    <p>Методи LINQ приймають <strong>делегати</strong> (вказівники на методи). Найчастіше це
+                        <code>Func&lt;T, bool&gt;</code> (предикат). Лямбда-вираз <code>=&gt;</code> — це анонімна
+                        функція, яка перетворюється на цей делегат.</p>
+                </div>
+
+                <pre style="margin-top: 0;"><code class="language-csharp">// 1. Явне створення делегату (довго)
+Func&lt;int, bool&gt; isEvenDelegate = delegate (int x) { return x % 2 == 0; };
+var result1 = numbers.Where(isEvenDelegate);
+
+// 2. Використання лямбда-виразу (коротко і сучасно)
+// Читається: "для кожного n повернути істину, якщо n парне"
+var result2 = numbers.Where(n =&gt; n % 2 == 0);</code></pre>
+
+                <div class="box light-blue-box" style="margin-top: 15px;">
+                    <p>Компілятор C# сам розуміє, що <code>n</code> має тип <code>int</code>, оскільки
+                        <code>numbers</code> — це колекція чисел. Явно вказувати тип не потрібно.</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">9</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 10: Відкладене виконання -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Відкладене виконання (Deferred Execution)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Написання запиту LINQ та його фактичне виконання — це дві різні події, рознесені у
+                    часі.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">List&lt;int&gt; numbers = new List&lt;int&gt; { 1, 2, 3 };
+
+// 1. Формування запиту (виконання НЕ відбувається)
+var query = numbers.Where(n =&gt; n &gt; 1);
+
+// Змінюємо колекцію ДО виконання запиту
+numbers.Add(4);
+
+// 2. Фактичне виконання запиту (ТРИГЕР)
+foreach (var num in query)
+{
+    Console.WriteLine(num); // Виведе 2, 3 та 4!
+}</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">10</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 11: Матеріалізація -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Матеріалізація запитів (ToList, ToArray)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Більшість методів LINQ повертають <code>IEnumerable&lt;T&gt;</code> ("обіцянку"
+                    даних). Щоб виконати запит негайно і зберегти результат в пам'яті, використовують методи
+                    <strong>матеріалізації</strong>.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">List&lt;int&gt; numbers = new List&lt;int&gt; { 1, 2, 3 };
+
+// Запит виконується НЕГАЙНО завдяки ToList().
+// Створюється нова фізична колекція List&lt;int&gt;.
+var resultList = numbers.Where(n =&gt; n &gt; 1).ToList();
+
+numbers.Add(4); // Ця зміна вже НЕ вплине на resultList</code></pre>
+
+                <div class="box warning-box" style="margin-top: 15px;">
+                    <p><strong>Коли матеріалізувати?</strong> Якщо результати запиту перебиратимуться кілька разів
+                        (кілька <code>foreach</code>), матеріалізуйте їх (через <code>ToList()</code> або
+                        <code>ToArray()</code>), щоб уникнути багаторазового перерахунку запиту.</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">11</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 12: Групи методів: Фільтрація -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Групи методів LINQ: Фільтрація</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Відбирають елементи, які відповідають умові або мають певний тип.</p>
+
+                <ul class="standard-list">
+                    <li><strong><code>Where</code></strong> — фільтрує за заданою умовою (предикатом).</li>
+                    <li><strong><code>OfType&lt;T&gt;</code></strong> — витягує елементи, які можна безпечно привести до
+                        типу T.</li>
+                </ul>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">int[] numbers = { 1, 2, 3, 4, 5, 6 };
+
+// Приклад Where: беремо лише парні числа
+var evens = numbers.Where(n =&gt; n % 2 == 0); 
+// { 2, 4, 6 }
+
+object[] mixedData = { 1, "Hello", 2, "World", 3.5 };
+
+// Приклад OfType: витягуємо лише рядки
+var stringsOnly = mixedData.OfType&lt;string&gt;(); 
+// { "Hello", "World" }</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">12</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 13: Групи методів: Проєкція -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Групи методів LINQ: Проєкція</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Перетворюють елементи з одного типу в інший.</p>
+
+                <ul class="standard-list">
+                    <li><strong><code>Select</code></strong> — трансформує кожен елемент (відображення 1 до 1).</li>
+                    <li><strong><code>SelectMany</code></strong> — "сплющує" колекції колекцій у плоский список (1 до
+                        багатьох).</li>
+                </ul>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">string[] words = { "C#", "LINQ" };
+
+// Select: отримуємо довжину кожного слова
+var lengths = words.Select(w =&gt; w.Length); // { 2, 4 }
+
+string[] phrases = { "Hello world", "LINQ is cool" };
+
+// SelectMany: розбиваємо фрази на масиви слів і зводимо в один список
+var allWords = phrases.SelectMany(p =&gt; p.Split(' ')); 
+// { "Hello", "world", "LINQ", "is", "cool" }</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">13</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 14: Групи методів: Сортування -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Групи методів LINQ: Сортування</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Впорядковують елементи за зростанням або спаданням.</p>
+
+                <ul class="standard-list">
+                    <li><strong><code>OrderBy</code> / <code>OrderByDescending</code></strong> — первинне сортування.
+                    </li>
+                    <li><strong><code>ThenBy</code> / <code>ThenByDescending</code></strong> — вторинне сортування (якщо
+                        первинні ключі рівні).</li>
+                </ul>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">string[] fruits = { "apple", "cat", "banana", "car" };
+
+// Сортування: спочатку за довжиною слова, потім за алфавітом
+var sorted = fruits
+    .OrderBy(f =&gt; f.Length)
+    .ThenBy(f =&gt; f);
+
+// Результат: { "car", "cat", "apple", "banana" }
+// (car і cat мають довжину 3, але 'r' йде перед 't' в алфавіті)</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">14</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 15: Групи методів: Квантифікатори -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Групи методів LINQ: Квантифікатори</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Завжди повертають логічне значення (<code>bool</code>).</p>
+
+                <ul class="standard-list">
+                    <li><strong><code>Any</code></strong> — чи є хоча б один елемент, що відповідає умові.</li>
+                    <li><strong><code>All</code></strong> — чи всі елементи відповідають умові.</li>
+                    <li><strong><code>Contains</code></strong> — чи є конкретний елемент у колекції.</li>
+                </ul>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">int[] numbers = { 1, 2, 3, 4, 5 };
+
+// Any: чи є числа більші за 4?
+bool hasLarge = numbers.Any(n =&gt; n &gt; 4); // true
+
+// All: чи всі числа є додатними?
+bool allPositive = numbers.All(n =&gt; n &gt; 0); // true
+
+// Contains: чи є число 5 у масиві?
+bool hasFive = numbers.Contains(5); // true</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">15</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 16: Групи методів: Пагінація -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Групи методів LINQ: Пагінація</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Дозволяють брати або пропускати елементи. Ідеальні для сторінкового виводу.</p>
+
+                <ul class="standard-list">
+                    <li><strong><code>Take</code> / <code>Skip</code></strong> — бере або пропускає вказану кількість
+                        елементів.</li>
+                    <li><strong><code>TakeWhile</code> / <code>SkipWhile</code></strong> — бере/пропускає елементи, поки
+                        умова є істинною.</li>
+                </ul>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">int[] numbers = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+// Skip та Take: пропускаємо 3 елементи і беремо наступні 2
+var paged = numbers.Skip(3).Take(2); // { 4, 5 }
+
+// TakeWhile: беремо елементи, поки вони менші за 4
+var taken = numbers.TakeWhile(n =&gt; n &lt; 4); // { 1, 2, 3 }</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">16</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 17: Групи методів: Витягнення елементів -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Групи методів LINQ: Витягнення елементів</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Повертають один конкретний елемент, а не колекцію.</p>
+
+                <ul class="standard-list">
+                    <li><strong><code>First</code> / <code>FirstOrDefault</code></strong> — повертає перший елемент (або
+                        перший за умовою).</li>
+                    <li><strong><code>Single</code> / <code>SingleOrDefault</code></strong> — вимагає, щоб елемент був
+                        <em>єдиним</em> у колекції.</li>
+                </ul>
+
+                <pre style="margin-top: 10px;"><code class="language-csharp">int[] numbers = { 1, 2, 3, 4, 5 };
+
+// First: перший елемент, більший за 3
+int firstLarge = numbers.First(n =&gt; n &gt; 3); // 4
+
+// FirstOrDefault: безпечно поверне 0 (за замовчуванням), якщо не знайдено
+int notFound = numbers.FirstOrDefault(n =&gt; n &gt; 100); // 0</code></pre>
+
+                <div class="box success-box" style="margin-top: 10px;">
+                    <p><strong>Порада:</strong> Віддавайте перевагу методам із суфіксом <code>OrDefault</code>, щоб
+                        уникнути падіння програми (Exception) при відсутності елемента.</p>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">17</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 18: Групи методів: Агрегація -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Групи методів LINQ: Агрегація</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Виконують математичні та статистичні обчислення над колекцією.</p>
+
+                <ul class="standard-list">
+                    <li><strong><code>Count</code></strong> — рахує кількість елементів.</li>
+                    <li><strong><code>Sum, Min, Max, Average</code></strong> — стандартна математика.</li>
+                    <li><strong><code>Aggregate</code></strong> — згортає колекцію в одне значення за вашим правилом.
+                    </li>
+                </ul>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">int[] numbers = { 1, 2, 3, 4, 5 };
+
+int total = numbers.Count(); // 5
+int sumOfAll = numbers.Sum(); // 15
+double avgVal = numbers.Average(); // 3.0
+
+// Aggregate: перемножуємо всі елементи (факторіал)
+// x - акумулятор (зберігає результат), y - поточний елемент
+int factorial = numbers.Aggregate((x, y) =&gt; x * y); // 120</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">18</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 19: Побудова ланцюжків (Method Chaining) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Побудова ланцюжків (Method Chaining)</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Оскільки методи LINQ повертають <code>IEnumerable&lt;T&gt;</code>, їх можна
+                    об'єднувати у довгі ланцюжки (Fluent API). Вихідні дані одного методу стають вхідними для
+                    наступного.</p>
+
+                <pre style="margin-top: 15px;"><code class="language-csharp">int[] numbers = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+// Завдання: знайти квадрати всіх парних чисел, 
+// відсортувати їх за спаданням і взяти лише перші два.
+
+var topTwoEvenSquares = numbers
+    .Where(n =&gt; n % 2 == 0)      // 1. фільтруємо { 2, 4, 6, 8, 10 }
+    .Select(n =&gt; n * n)          // 2. квадрати { 4, 16, 36, 64, 100 }
+    .OrderByDescending(n =&gt; n)   // 3. сортуємо { 100, 64, 36, 16, 4 }
+    .Take(2)                     // 4. беремо перші два { 100, 64 }
+    .ToList();                   // 5. матеріалізуємо у List&lt;int&gt;</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">19</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 20: Оптимізація ланцюжків -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Оптимізація: Порядок має значення</h2>
+            </div>
+            <div class="content">
+                <div class="box warning-box" style="margin-bottom: 15px;">
+                    <p><strong>Золоте правило:</strong> Фільтруйте якомога раніше! Чим раніше ви застосуєте
+                        <code>Where</code>, тим менше елементів доведеться обробляти важким методам
+                        (<code>OrderBy</code>, <code>Select</code>).</p>
+                </div>
+
+                <pre style="margin-top: 0;"><code class="language-csharp">string[] words = { "cat", "elephant", "dog", "tiger", "lion", "mouse" };
+
+// НЕЕФЕКТИВНО (Спочатку сортуємо всі 6 слів, а потім відкидаємо):
+var badQuery = words
+    .OrderBy(w =&gt; w)           
+    .Select(w =&gt; w.ToUpper())  
+    .Where(w =&gt; w.Length &gt; 4)  
+    .ToList();
+
+// ЕФЕКТИВНО (Спочатку відкидаємо непотрібне, потім сортуємо лише 3 слова):
+var goodQuery = words
+    .Where(w =&gt; w.Length &gt; 4)  
+    .OrderBy(w =&gt; w)           
+    .Select(w =&gt; w.ToUpper())  
+    .ToList();</code></pre>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">20</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 21: Перевірка знань 1 (Відкладене виконання) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Перевірка знань 1: Відкладене виконання</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Який буде результат виконання цього коду і чому?</p>
+
+                <pre
+                    style="margin-top: 15px; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"><code class="language-csharp">var colors = new List&lt;string&gt; { "green", "brown", "blue", "red" };
+
+// Створюємо запит
+var query = colors.Where(c =&gt; c.Length == 3);
+
+// Змінюємо колекцію
+colors.Remove("red");
+
+// Виводимо результат
+Console.WriteLine(query.Count());</code></pre>
+
+                <div style="margin-top: 20px;">
+                    <button onclick="this.nextElementSibling.style.display='block'; this.style.display='none';"
+                        style="padding: 10px 20px; font-size: 16px; font-weight: 600; background: #2E7D32; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s;">Показати
+                        відповідь</button>
+
+                    <div style="display: none; margin-top: 15px;" class="box light-blue-box">
+                        <h4 class="blue-text" style="margin-top: 0;">Відповідь: 0</h4>
+                        <p>Запит виконується <strong>лише в момент виклику <code>Count()</code></strong> (відкладене
+                            виконання). На цей момент слово "red" (єдине слово з 3 літер у масиві) вже видалене з
+                            колекції, тому елементів, що відповідають умові, більше немає.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">21</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 22: Перевірка знань 2 (Ланцюжки методів) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Перевірка знань 2: Трансформація даних</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Що виведе цей цикл на екран?</p>
+
+                <pre
+                    style="margin-top: 15px; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"><code class="language-csharp">var numbers = new int[] { 1, 2, 3, 4, 5 };
+
+var query = numbers
+    .Where(n =&gt; n % 2 != 0)
+    .Select(n =&gt; n * 2);
+
+foreach (var item in query) 
+{ 
+   Console.Write(item + " "); 
+}</code></pre>
+
+                <div style="margin-top: 20px;">
+                    <button onclick="this.nextElementSibling.style.display='block'; this.style.display='none';"
+                        style="padding: 10px 20px; font-size: 16px; font-weight: 600; background: #2E7D32; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s;">Показати
+                        відповідь</button>
+
+                    <div style="display: none; margin-top: 15px;" class="box light-orange-box">
+                        <h4 class="orange-text" style="margin-top: 0;">Відповідь: 2 6 10</h4>
+                        <p>Крок 1: Метод <code>Where</code> відкидає парні числа і залишає лише <strong>1, 3,
+                                5</strong>.<br>
+                            Крок 2: Метод <code>Select</code> бере кожне з цих чисел і множить на 2, утворюючи нову
+                            послідовність: <strong>2, 6, 10</strong>.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">22</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 23: Перевірка знань 3 (Пастки LINQ) -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Перевірка знань 3: Пастки LINQ</h2>
+            </div>
+            <div class="content">
+                <p class="intro-text">Чому виконання цього коду призведе до падіння програми?</p>
+
+                <pre
+                    style="margin-top: 15px; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"><code class="language-csharp">var numbers = new List&lt;int&gt; { 10, 20, 30, 40 };
+
+var result = numbers.SingleOrDefault(x =&gt; x &gt; 25);
+
+Console.WriteLine(result);</code></pre>
+
+                <div style="margin-top: 20px;">
+                    <button onclick="this.nextElementSibling.style.display='block'; this.style.display='none';"
+                        style="padding: 10px 20px; font-size: 16px; font-weight: 600; background: #2E7D32; color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s;">Показати
+                        відповідь</button>
+
+                    <div style="display: none; margin-top: 15px;" class="box warning-box">
+                        <h4 style="margin-top: 0;">Відповідь: InvalidOperationException</h4>
+                        <p>Умові <code>x &gt; 25</code> відповідають ОДРАЗУ ДВА числа (30 і 40). Метод
+                            <strong><code>SingleOrDefault</code></strong> створений для пошуку <em>унікального</em>
+                            елемента і він кине виняток, якщо знайде більше одного збігу. Для пошуку першого-ліпшого
+                            елемента потрібно було використати <strong><code>FirstOrDefault</code></strong>.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">23</span> / <span class="total">24</span></span>
+                <button class="btn nextBtn">Наступний →</button>
+            </div>
+        </div>
+
+        <!-- Slide 24: Висновки -->
+        <div class="slide">
+            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
+            <div class="slide-header">
+                <h2>Висновки</h2>
+            </div>
+            <div class="content">
+                <div class="vertical-flex push-down">
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">Декларативний код (LINQ)</strong>
+                        <p class="metric-desc">Абстрагує цикли та перевірки, фокусуючи розробника на тому, ЩО треба
+                            зробити. Покращує читабельність та зменшує кількість помилок.</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">Анатомія LINQ</strong>
+                        <p class="metric-desc">Побудований на методах розширення (Extension Methods) та лямбда-виразах
+                            (анонімних методах-делегатах).</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">Ліниве виконання</strong>
+                        <p class="metric-desc">Запити не виконуються одразу. Вони запускаються лише під час перебору в
+                            foreach або виклику агрегаторів (Count, First).</p>
+                    </div>
+
+                    <div class="box full-width-box tight-box">
+                        <strong class="primary-text">Матеріалізація (ToList, ToArray)</strong>
+                        <p class="metric-desc">Використовується наприкінці ланцюжка для негайного виконання запиту та
+                            збереження результатів в оперативній пам'яті.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation">
+                <button class="btn prevBtn">← Попередній</button>
+                <span class="slide-counter"><span class="current">21</span> / <span class="total">21</span></span>
+                <button class="btn nextBtn" disabled>Наступний →</button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Стандартне підключення зовнішнього скрипта -->
+    <script src="script.js"></script>
+
+    <!-- Ініціалізація підсвічування синтаксису -->
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
+        });
+    </script>
+</body>
+
+</html>
