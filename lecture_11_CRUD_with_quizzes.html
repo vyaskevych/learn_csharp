@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+
+<html lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="#00828a" name="theme-color"/>
+<title>Лекція 11. Життєвий цикл сутностей (CRUD) — ООП</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Спільні стилі з лекціями 6–10 (файли зберігати в одному каталозі) -->
+<link href="style.css" rel="stylesheet"/>
+<link href="oop.css" rel="stylesheet"/>
+<link href="highlight-theme.css" rel="stylesheet"/>
+<script defer="" src="highlight.min.js"></script>
+</head>
+<body>
+<main class="app">
+<header class="topbar">
+<div class="brandmark"><img alt="Герб університету" class="university-logo" height="45" src="logo.png" width="36"/><span>Життєвий цикл сутностей (CRUD) <small class="lecture-badge">· Лекція 11</small></span></div>
+<div class="bar-actions"><button class="utility" id="overview-btn" title="Усі слайди (O)" type="button">☷ Огляд</button><button class="utility" id="fullscreen-btn" title="Повний екран (F)" type="button">⛶ Екран</button></div>
+</header>
+<div aria-label="Лекція 11. Життєвий цикл сутностей (CRUD)" class="deck" id="deck">
+<section aria-label="Титульний слайд" class="slide title-slide active" data-section="11">
+<div class="title-content">
+<h1 class="old-title-heading">Лекція 11. Життєвий цикл сутностей (CRUD)</h1>
+<p class="title-subtitle">Модуль 5. Проєктування систем</p>
+<div class="title-rule"></div>
+<div class="title-meta"><p><strong>Курс:</strong> Об’єктно-орієнтоване програмування</p><p><strong>Спеціальність:</strong> F3 Комп’ютерні науки</p><p>Київський столичний університет імені Бориса Грінченка</p></div>
+<div aria-hidden="true" class="hero-art"><div class="hero-ring a"></div><div class="hero-ring b"></div><div class="hero-ring c"></div><span>C#</span></div>
+</div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">01 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer> </section>
+<section aria-label="Слайд 2: План лекції" class="slide" data-section="1">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>План лекції</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="roadmap">
+<div class="road"><span class="road-no">01</span><span><strong>Сутність та її ідентичність</strong><small>Атрибути й правила коректності</small></span></div>
+<div class="road"><span class="road-no">02</span><span><strong>Життєвий цикл</strong><small>Поява, зміна, вилучення</small></span></div>
+<div class="road"><span class="road-no">03</span><span><strong>CRUD</strong><small>Чотири операції та контракти</small></span></div>
+<div class="road"><span class="road-no">04</span><span><strong>Модель і сховище</strong><small>Book та List&lt;Book&gt;</small></span></div>
+<div class="road"><span class="road-no">05</span><span><strong>Create / Read</strong><small>Створення, пошук, перегляд</small></span></div>
+<div class="road"><span class="road-no">06</span><span><strong>Update / Delete</strong><small>Редагування та видалення</small></span></div>
+<div class="road"><span class="road-no">07</span><span><strong>Наскрізний приклад</strong><small>Сценарій виконання і тести</small></span></div>
+<div class="road"><span class="road-no">08</span><span><strong>Архітектурні висновки</strong><small>Помилки, складність, рефакторинг</small></span></div>
+</div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">02 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 3: Від об’єктів до керування даними" class="slide" data-section="1">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Від об’єктів до керування даними</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">У попередніх модулях ми вивчили класи, інкапсуляцію, інтерфейси, <code>List&lt;T&gt;</code> і LINQ. Тепер застосуємо ці засоби разом — для керування множиною об’єктів.</p>
+<div class="three-columns">
+<div class="box light-blue-box"><h4>Було</h4><p>Створення й використання окремих об’єктів C#.</p></div>
+<div class="box"><h4>Стало</h4><p>Каталог, що зберігає об’єкти та керує їхнім життєвим циклом.</p></div>
+<div class="box success-box"><h4>Навчальна мета</h4><p>Побудувати повний CRUD у пам’яті, без бази даних і GUI.</p></div>
+</div>
+<div class="box primary-box tight-box"><p><strong>Приклад:</strong> електронний каталог книг — додати книгу, знайти її, змінити дані та вилучити запис.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">03 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 4: Сутність предметної області" class="slide" data-section="1">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Сутність предметної області</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="box primary-box"><h4>Сутність (Entity)</h4><p>Об’єкт, який система відрізняє від інших насамперед за <strong>ідентичністю</strong> і для якого зберігає дані про стан.</p></div>
+<div class="three-columns">
+<div class="box"><h4>Ідентичність</h4><p><code>Id = 7</code></p><p class="metric-desc">Однозначно визначає запис.</p></div>
+<div class="box light-blue-box"><h4>Атрибути</h4><p><code>Title</code>, <code>Author</code></p><p class="metric-desc">Описують книгу й можуть змінюватися.</p></div>
+<div class="box success-box"><h4>Інваріанти</h4><p><code>Id &gt; 0</code>, назва не порожня.</p><p class="metric-desc">Описують допустимий стан.</p></div>
+</div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">04 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 5: Ідентичність ≠ значення атрибутів" class="slide" data-section="1">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Ідентичність ≠ значення атрибутів</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Дві книги можуть мати однакову назву, але бути різними сутностями.</p><table class="data-table"><thead><tr><th>Id</th><th>Title</th><th>Author</th><th>Це одна й та сама сутність?</th></tr></thead><tbody><tr><td>1</td><td>Алгоритми</td><td>Олена Коваль</td><td>Ні, бо різні Id</td></tr><tr><td>2</td><td>Алгоритми</td><td>Марія Литвин</td><td>Ні, бо різні Id</td></tr><tr><td>1</td><td>Алгоритми та структури даних</td><td>Олена Коваль</td><td>Так, це оновлення книги № 1</td></tr></tbody></table><div class="box light-blue-box tight-box"><p><strong>Правило:</strong> змінюється <code>Title</code>, але <code>Id</code> залишається тим самим.</p></div>
+<p><strong>Подумайте:</strong> чому назва книги не може бути надійним унікальним ідентифікатором?</p>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">05 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Контрольна зупинка 1: Що зберігає ідентичність сутності?" class="slide" data-section="1">
+<header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 11 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 1/8 <span>•</span> 2 БАЛИ</div><h2>Що зберігає ідентичність сутності?</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text"><strong>Ситуація:</strong> у каталозі зберігаються дві книги з однаковою назвою, але з <code>Id = 3</code> та <code>Id = 7</code>. Назву книги № 3 змінено.</p>
+<div class="box light-blue-box"><h4>Яке твердження правильне?</h4><ol style="list-style-type: upper-alpha;" type="A"><li>У каталозі тепер одна сутність, бо назви збігаються.</li><li>Зміна назви створює нову сутність з іншим <code>Id</code>.</li><li>Книга № 3 залишається тією самою сутністю.</li><li>Ідентичність книги визначає її індекс у списку.</li></ol></div>
+<p><strong>Завдання:</strong> назвіть літеру відповіді та поясніть різницю між <code>Id</code> й атрибутом <code>Title</code>.</p>
+<div class="answer-check"><button aria-expanded="false" class="answer-reveal" type="button">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Правильна відповідь: C.</strong> Ідентичність визначається стабільним <code>Id</code>; <code>Title</code> — змінний атрибут. Книга № 3 після зміни назви залишається тією самою сутністю.</p><ul class="standard-list"><li><strong>A — хибне:</strong> однакові назви не роблять дві книги однією сутністю.</li><li><strong>B — хибне:</strong> зміна назви — це оновлення атрибута, а не створення нової сутності.</li><li><strong>C — правильне:</strong> змінюється лише <code>Title</code>, а <code>Id</code> лишається тим самим.</li><li><strong>D — хибне:</strong> індекс у списку може змінюватися після видалень або вставок і не є надійним ідентифікатором.</li></ul></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">06 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 7: Життєвий цикл сутності" class="slide" data-section="2">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Життєвий цикл сутності</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Життєвий цикл описує появу, доступність, зміну й вилучення сутності зі сховища.</p>
+<div class="flow-steps">
+<div class="flow-step"><strong>Немає запису</strong><small>Книги ще немає в каталозі</small></div>
+<div class="flow-step"><strong>Create</strong><small>Створення та додавання</small></div>
+<div class="flow-step"><strong>Є в каталозі</strong><small>Read — перегляд, Update — зміна</small></div>
+<div class="flow-step"><strong>Delete</strong><small>Вилучення з колекції</small></div>
+</div>
+<div class="box light-blue-box"><p><strong>Read</strong> не змінює стан. <strong>Update</strong> може виконуватися неодноразово, поки запис перебуває у каталозі.</p></div>
+<div class="box warning-box tight-box"><p>Тут сховище — <code>List&lt;Book&gt;</code> у оперативній пам’яті, а видалення реалізоване через <code>RemoveAt</code>.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">07 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 8: Вилучення з каталогу ≠ знищення об’єкта" class="slide" data-section="2">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Вилучення з каталогу ≠ знищення об’єкта</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="two-columns"><div><div class="box light-blue-box"><h4>Логічний життєвий цикл</h4><p>Після <code>Delete(id)</code> каталог більше не повертає книгу через <code>Read(id)</code>.</p></div></div><div><div class="box light-orange-box"><h4>Пам’ять C# / .NET</h4><p>Якщо інша змінна зберігає посилання на об’єкт, він може залишатися в пам’яті.</p></div></div></div>
+<div class="box primary-box"><p><strong>Висновок:</strong> керування записами каталогу та збирання сміття (Garbage Collection) — різні механізми.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">08 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 9: Інваріанти протягом життєвого циклу" class="slide" data-section="2">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Інваріанти протягом життєвого циклу</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="vertical-flex">
+<div class="box tight-box"><strong class="primary-text">01. Унікальна ідентичність.</strong><p class="metric-desc">У межах каталогу кожна книга має власний додатний <code>Id</code>.</p></div>
+<div class="box tight-box"><strong class="primary-text">02. Коректні атрибути.</strong><p class="metric-desc"><code>Title</code> та <code>Author</code> не складаються тільки з пробілів.</p></div>
+<div class="box tight-box"><strong class="primary-text">03. Стабільний Id.</strong><p class="metric-desc">Редагування не змінює ідентифікатор сутності.</p></div>
+<div class="box tight-box"><strong class="primary-text">04. Передбачувана невдача.</strong><p class="metric-desc">Некоректна операція не повинна частково змінити дані.</p></div>
+</div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">09 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Контрольна зупинка 2: Перевірка інваріантів" class="slide" data-section="2">
+<header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 11 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 2/8 <span>•</span> 2 БАЛИ</div><h2>Перевірка інваріантів</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text"><strong>Вимога:</strong> навіть якщо операція завершилася невдало, каталог має залишитися коректним.</p>
+<div class="box light-orange-box"><h4>Оберіть ДВА правильні твердження</h4><ol style="list-style-type: upper-alpha;" type="A"><li>Після невдалої операції <code>Create</code> лічильник <code>_nextId</code> можна збільшити.</li><li>Кожний доданий запис повинен мати додатний унікальний <code>Id</code>.</li><li>Після невдалого <code>Update</code> допустима часткова зміна назви.</li><li>Якщо нова назва складається з пробілів, <code>Update</code> має відхилити зміну.</li></ol></div>
+<div class="answer-check"><button aria-expanded="false" class="answer-reveal" type="button">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Правильні відповіді: B і D.</strong> Невдала операція не повинна змінювати стан каталогу, а всі успішно додані записи мають зберігати інваріанти.</p><ul class="standard-list"><li><strong>A — хибне:</strong> якщо <code>Create</code> завершився невдало, не можна «витрачати» наступний <code>Id</code>.</li><li><strong>B — правильне:</strong> кожен доданий запис повинен мати додатний унікальний <code>Id</code>.</li><li><strong>C — хибне:</strong> після невдалого <code>Update</code> часткові зміни неприпустимі.</li><li><strong>D — правильне:</strong> назва з одних пробілів є некоректною, тому <code>Update</code> має відхилити зміну.</li></ul></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">10 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 11: CRUD: чотири базові операції" class="slide" data-section="3">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>CRUD: чотири базові операції</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="principles">
+<div class="principle"><b>C</b><div><strong>Create — створення</strong><p>Додати нову книгу з новим <code>Id</code>.</p></div></div>
+<div class="principle"><b>R</b><div><strong>Read — читання</strong><p>Знайти книгу або переглянути весь каталог.</p></div></div>
+<div class="principle"><b>U</b><div><strong>Update — оновлення</strong><p>Змінити назву/автора, зберігши <code>Id</code>.</p></div></div>
+<div class="principle"><b>D</b><div><strong>Delete — видалення</strong><p>Прибрати запис із каталогу.</p></div></div>
+</div>
+<div class="box light-blue-box tight-box"><p>CRUD — поширена модель базових операцій над сутностями, але сам по собі цей набір ще не визначає архітектуру всієї програми.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">11 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 12: Контракти CRUD-методів" class="slide" data-section="3">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Контракти CRUD-методів</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Для кожного методу потрібно визначити <strong>вхідні дані, умови виконання та результат</strong>.</p><table class="data-table"><thead><tr><th>Метод</th><th>Вхід</th><th>Умова</th><th>Результат</th></tr></thead><tbody><tr><td><code>Create</code></td><td>Назва, автор</td><td>Обидва непорожні</td><td><code>Book?</code></td></tr><tr><td><code>Read</code></td><td><code>Id</code></td><td>Пошук</td><td><code>Book?</code></td></tr><tr><td><code>ReadAll</code></td><td>—</td><td>Без змін</td><td><code>IReadOnlyList&lt;Book&gt;</code></td></tr><tr><td><code>Update</code></td><td><code>Id</code> та нові поля</td><td>Існує й коректна</td><td><code>bool</code></td></tr><tr><td><code>Delete</code></td><td><code>Id</code></td><td>Існує</td><td><code>bool</code></td></tr></tbody></table><p class="note">У нашому навчальному API <code>null</code> або <code>false</code> означає, що операцію не виконано.</p>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">12 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 13: Які дії змінюють дані?" class="slide" data-section="3">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Які дії змінюють дані?</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="two-columns">
+<div class="box success-box"><h4>Read</h4><p>Лише отримання даних.</p><ul class="standard-list"><li>Не змінює каталог.</li><li>Не створює дублікатів.</li><li>Може повернути <code>null</code>.</li></ul></div>
+<div class="box light-orange-box"><h4>Create · Update · Delete</h4><p>Змінюють вміст або стан каталогу.</p><ul class="standard-list"><li>Створення нового запису.</li><li>Зміна атрибутів.</li><li>Видалення запису.</li></ul></div>
+</div>
+<div class="box light-blue-box"><p><strong>Приклад:</strong> повторне <code>Delete(7)</code> після першого успішного видалення повертає <code>false</code>, а не вилучає іншу книгу.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">13 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Контрольна зупинка 3: Визначте операції, що змінюють дані" class="slide" data-section="3">
+<header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 11 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 3/8 <span>•</span> 2 БАЛИ</div><h2>Визначте операції, що змінюють дані</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Після створення двох книг студент виконав чотири дії. <strong>Які виклики змінюють стан каталогу?</strong></p>
+<div class="two-columns"><div class="box tight-box"><p><strong>A.</strong> <code>catalog.Read(1)</code></p><p><strong>B.</strong> <code>catalog.ReadAll()</code></p></div><div class="box tight-box"><p><strong>C.</strong> <code>catalog.Update(1, "Нова", "Автор")</code></p><p><strong>D.</strong> <code>catalog.Delete(2)</code></p></div></div>
+<div class="box light-blue-box tight-box"><p><strong>Умова:</strong> обидві книги існують, а нові атрибути коректні. Виберіть усі виклики, що змінюють дані, і поясніть, чому інші їх не змінюють.</p></div>
+<div class="answer-check"><button aria-expanded="false" class="answer-reveal" type="button">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Правильні відповіді: C і D.</strong> Лише ці виклики змінюють стан каталогу.</p><ul class="standard-list"><li><strong>A — хибне:</strong> <code>Read(1)</code> лише повертає книгу, але не змінює дані.</li><li><strong>B — хибне:</strong> <code>ReadAll()</code> надає доступ до перегляду колекції без її модифікації.</li><li><strong>C — правильне:</strong> <code>Update(...)</code> змінює атрибути наявної книги.</li><li><strong>D — правильне:</strong> <code>Delete(2)</code> вилучає книгу з каталогу.</li></ul></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">14 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 15: Модель Book: атрибути та конструктор" class="slide" data-section="4">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Модель Book: атрибути та конструктор</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Властивості мають лише <code>get</code>; зовнішній код не може довільно змінювати <code>Id</code>, <code>Title</code> або <code>Author</code>.</p><pre><code class="language-csharp">public class Book
+{
+    public int Id { get; }
+    public string Title { get; }
+    public string Author { get; }
+
+    public Book(int id, string title, string author)
+    {
+        // Перевірки значень — на наступному слайді
+        Id = id;
+        Title = title.Trim();
+        Author = author.Trim();
+    }
+}</code></pre><div class="box light-blue-box tight-box"><p><strong>Зверніть увагу:</strong> це схема структури моделі; повний конструктор містить валідацію.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">15 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 16: Book: перевірка інваріантів" class="slide" data-section="4">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Book: перевірка інваріантів</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">У повній реалізації конструктор перевіряє аргументи <strong>до</strong> присвоєння значень.</p><pre><code class="language-csharp">public Book(int id, string title, string author)
+{
+    if (id &lt;= 0)
+        throw new ArgumentOutOfRangeException(nameof(id));
+    if (string.IsNullOrWhiteSpace(title))
+        throw new ArgumentException("Назва не може бути порожньою.");
+    if (string.IsNullOrWhiteSpace(author))
+        throw new ArgumentException("Автор не може бути порожнім.");
+
+    Id = id;
+    Title = title.Trim();
+    Author = author.Trim();
+}</code></pre><p><code>IsNullOrWhiteSpace</code> перевіряє рядок, <code>Trim()</code> прибирає крайні пробіли, а <code>throw</code> сигналізує про помилку.</p>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">16 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 17: Book: представлення для користувача" class="slide" data-section="4">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Book: представлення для користувача</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Перевизначений <code>ToString()</code> дає читабельний текст, який можна виводити без формування рядка в кожному місці програми.</p><pre><code class="language-csharp">public override string ToString()
+{
+    return $"{Id} | {Title} | {Author}";
+}</code></pre><div class="two-columns"><div class="box"><h4>Об’єкт</h4><p><code>Id = 1</code></p><p><code>Title = "Алгоритми"</code></p><p><code>Author = "Олена Коваль"</code></p></div><div class="box success-box"><h4>Результат ToString()</h4><p><code>1 | Алгоритми | Олена Коваль</code></p><p class="metric-desc">Застосовується в консолі навчального прикладу.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">17 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 18: BookCatalog: керування колекцією" class="slide" data-section="4">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>BookCatalog: керування колекцією</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Окремий клас відповідає за зберігання книг та надає операції CRUD.</p><pre><code class="language-csharp">public class BookCatalog
+{
+    private readonly List&lt;Book&gt; _books = new List&lt;Book&gt;();
+    private int _nextId = 1;
+
+    // Create, Read, ReadAll, Update, Delete
+}</code></pre><div class="two-columns"><div class="box light-blue-box"><h4><code>private readonly</code></h4><p>Зовнішній код не має прямого доступу до списку, а поле не можна перепризначити.</p></div><div class="box"><h4><code>_nextId</code></h4><p>Новий номер видається після успішного створення; видалений номер одразу не перевикористовується.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">18 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 19: Create: створення нової книги" class="slide" data-section="5">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Create: створення нової книги</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Метод перевіряє поля, створює книгу, додає її до списку та повертає створений об’єкт.</p><pre><code class="language-csharp">public Book? Create(string title, string author)
+{
+    if (string.IsNullOrWhiteSpace(title) ||
+        string.IsNullOrWhiteSpace(author))
+        return null;
+
+    Book book = new Book(_nextId, title, author);
+    _books.Add(book);
+    _nextId++;
+    return book;
+}</code></pre><div class="box success-box tight-box"><p><strong>Гарантія:</strong> <code>_nextId</code> збільшується лише після успішного додавання книги.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">19 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 20: Create: успіх і відмова" class="slide" data-section="5">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Create: успіх і відмова</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="two-columns"><div class="box success-box"><h4>Успішне створення</h4><p><code>Create("Алгоритми", "Олена Коваль")</code></p><p>Результат: новий <code>Book</code>; список містить ще один запис.</p></div><div class="box warning-box"><h4>Некоректні дані</h4><p><code>Create("  ", "Марія Литвин")</code></p><p>Результат: <code>null</code>; колекція та <code>_nextId</code> не змінюються.</p></div></div>
+<div class="box light-blue-box tight-box"><p>Правила перевірки даних працюють <strong>до</strong> зміни стану каталогу.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">20 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Контрольна зупинка 4: Знайдіть помилку в Create" class="slide" data-section="5">
+<header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 11 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 4/8 <span>•</span> 3 БАЛИ</div><h2>Знайдіть помилку в Create</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">У методі <code>Create</code> змінили порядок дій. <strong>Знайдіть логічну помилку.</strong></p>
+<pre><code class="language-csharp">public Book? Create(string title, string author)
+{
+    int id = _nextId++;
+    if (string.IsNullOrWhiteSpace(title) ||
+        string.IsNullOrWhiteSpace(author))
+        return null;
+
+    Book book = new Book(id, title, author);
+    _books.Add(book);
+    return book;
+}</code></pre>
+<div class="box warning-box tight-box"><p><strong>Виклики:</strong> спочатку <code>Create("  ", "Автор")</code>, потім <code>Create("Алгоритми", "Автор")</code>. Який <code>Id</code> отримає друга книга? Як усунути помилку?</p></div>
+<div class="answer-check"><button aria-expanded="false" class="answer-reveal" type="button">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Відповідь:</strong> друга книга отримає <code>Id = 2</code>, тому що <code>_nextId++</code> виконано до перевірки даних, навіть якщо створення не відбулося.</p><p><strong>Виправлення:</strong> спочатку перевірити вхідні дані, а <code>_nextId++</code> виконати тільки після успішного <code>_books.Add(book)</code>.</p><p><strong>Типова помилка:</strong> здаватися, що невдала операція «нічого не робить». Насправді вона може непомітно зіпсувати стан лічильника.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">21 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 22: Read і ReadAll: пошук та перегляд" class="slide" data-section="5">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Read і ReadAll: пошук та перегляд</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Пошук за <code>Id</code> використовує LINQ; для перегляду колекції повертається інтерфейс лише для читання.</p><pre><code class="language-csharp">public Book? Read(int id)
+{
+    return _books.FirstOrDefault(book =&gt; book.Id == id);
+}
+
+public IReadOnlyList&lt;Book&gt; ReadAll()
+{
+    return _books.AsReadOnly();
+}</code></pre><div class="box light-blue-box tight-box"><p><code>FirstOrDefault</code> повертає перший збіг або <code>null</code>, якщо книгу не знайдено.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">22 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 23: Read: важливі деталі" class="slide" data-section="5">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Read: важливі деталі</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="vertical-flex">
+<div class="box tight-box"><strong class="primary-text"><code>Book?</code> і відсутній запис</strong><p class="metric-desc">Метод може повернути <code>null</code>; це очікуваний випадок, а не помилка алгоритму пошуку.</p></div>
+<div class="box tight-box"><strong class="primary-text">Лямбда-вираз</strong><p class="metric-desc"><code>book =&gt; book.Id == id</code> описує умову вибору елемента.</p></div>
+<div class="box tight-box"><strong class="primary-text"><code>AsReadOnly()</code> — не копія</strong><p class="metric-desc">Це обгортка над списком: зміни каталогу надалі будуть видимими в отриманому перегляді.</p></div>
+</div>
+<div class="box warning-box tight-box"><p><strong>Мікрозавдання:</strong> чому <code>Read(999)</code> краще повертати <code>null</code>, ніж випадкову книгу?</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">23 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Контрольна зупинка 5: Прогнозуйте результат ReadAll" class="slide" data-section="5">
+<header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 11 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 5/8 <span>•</span> 2 БАЛИ</div><h2>Прогнозуйте результат ReadAll</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Метод <code>ReadAll()</code> повертає <code>_books.AsReadOnly()</code>. Розгляньте послідовність дій:</p>
+<pre><code class="language-csharp">BookCatalog catalog = new BookCatalog();
+var view = catalog.ReadAll();
+
+catalog.Create("Алгоритми", "Автор");
+Console.WriteLine(view.Count);</code></pre>
+<div class="box light-orange-box tight-box"><h4>Що буде виведено на екран?</h4><p><strong>A.</strong> 0    <strong>B.</strong> 1    <strong>C.</strong> Помилка компіляції    <strong>D.</strong> null</p></div>
+<p>Поясніть, чи створює <code>AsReadOnly()</code> незалежну копію списку.</p>
+<div class="answer-check"><button aria-expanded="false" class="answer-reveal" type="button">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Правильна відповідь: B — 1.</strong> <code>AsReadOnly()</code> повертає обгортку над наявним списком, а не його копію. Тому через <code>view</code> видно подальші зміни колекції.</p><ul class="standard-list"><li><strong>A — хибне:</strong> 0 було б лише тоді, якби <code>ReadAll()</code> повертало окрему копію списку.</li><li><strong>B — правильне:</strong> після <code>Create(...)</code> у списку одна книга, і обгортка це відображає.</li><li><strong>C — хибне:</strong> код компілюється коректно.</li><li><strong>D — хибне:</strong> <code>Count</code> має числовий тип, тому значення <code>null</code> тут не виникає.</li></ul></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">24 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 25: Update: зміна атрибутів" class="slide" data-section="6">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Update: зміна атрибутів</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Спочатку перевіряємо нові значення, потім шукаємо позицію книги за <code>Id</code>.</p><pre><code class="language-csharp">public bool Update(int id, string newTitle, string newAuthor)
+{
+    if (string.IsNullOrWhiteSpace(newTitle) ||
+        string.IsNullOrWhiteSpace(newAuthor))
+        return false;
+
+    int index = _books.FindIndex(book =&gt; book.Id == id);
+    if (index == -1)
+        return false;
+
+    _books[index] = new Book(id, newTitle, newAuthor);
+    return true;
+}</code></pre><div class="box success-box tight-box"><p>Змінюються атрибути; ідентифікатор книги зберігається.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">25 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 26: Update: логічна сутність і екземпляр C#" class="slide" data-section="6">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Update: логічна сутність і екземпляр C#</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text"><code>Book</code> у прикладі незмінюваний після створення. Тому <code>Update</code> замінює <strong>екземпляр об’єкта у списку</strong>.</p>
+<div class="flow-steps"><div class="flow-step"><strong>Id = 1</strong><small>Title: «Алгоритми»<br/>Старий об’єкт</small></div><div class="flow-step"><strong>Update(1, ...)</strong><small>Створюється новий Book з тим самим Id</small></div><div class="flow-step"><strong>Id = 1</strong><small>Title: «Алгоритми та структури даних»</small></div></div>
+<div class="box warning-box"><p>Інша змінна, яка зберегла посилання на старий об’єкт, продовжує вказувати на нього. Для актуальних даних потрібно повторити <code>Read(id)</code>.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">26 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Контрольна зупинка 6: Update: що побачить старе посилання?" class="slide" data-section="6">
+<header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 11 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 6/8 <span>•</span> 3 БАЛИ</div><h2>Update: що побачить старе посилання?</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Клас <code>Book</code> незмінюваний; <code>Update</code> замінює об’єкт у списку новим екземпляром з тим самим <code>Id</code>.</p>
+<pre><code class="language-csharp">Book? saved = catalog.Read(1);
+catalog.Update(1, "Нова назва", "Автор");
+
+Console.WriteLine(saved?.Title);
+Console.WriteLine(catalog.Read(1)?.Title);</code></pre>
+<div class="box warning-box tight-box"><p><strong>Припустімо:</strong> до оновлення назва була <code>"Стара назва"</code>. Спрогнозуйте обидва рядки виведення. Чому значення відрізняються?</p></div>
+<div class="answer-check"><button aria-expanded="false" class="answer-reveal" type="button">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Виведення:</strong> перший рядок — <code>Стара назва</code>, другий — <code>Нова назва</code>.</p><p><code>saved</code> зберіг посилання на старий об’єкт, а <code>Update</code> замінив елемент колекції новим <code>Book</code> з тим самим <code>Id</code>.</p><p><strong>Зверніть увагу:</strong> стара змінна не «оновлюється автоматично», бо посилається на попередній екземпляр.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">27 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 28: Delete: вилучення за Id" class="slide" data-section="6">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Delete: вилучення за Id</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Спочатку шукаємо позицію за ідентифікатором; лише потім вилучаємо знайдений елемент.</p><pre><code class="language-csharp">public bool Delete(int id)
+{
+    int index = _books.FindIndex(book =&gt; book.Id == id);
+    if (index == -1)
+        return false;
+
+    _books.RemoveAt(index);
+    return true;
+}</code></pre><div class="two-columns"><div class="box success-box tight-box"><p><code>Delete(2)</code> → <code>true</code>, якщо запис знайдено.</p></div><div class="box warning-box tight-box"><p>Повторний <code>Delete(2)</code> → <code>false</code>.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">28 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 29: Чому Id не можна плутати з індексом?" class="slide" data-section="6">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Чому Id не можна плутати з індексом?</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Індекс — це поточна позиція у <code>List&lt;Book&gt;</code>; <code>Id</code> — стабільна ідентичність книги.</p><table class="data-table"><thead><tr><th>Індекс списку</th><th>Id книги</th><th>Назва</th></tr></thead><tbody><tr><td>0</td><td>1</td><td>Алгоритми</td></tr><tr><td>1</td><td>5</td><td>Основи C#</td></tr><tr><td>2</td><td>8</td><td>Структури даних</td></tr></tbody></table>
+<div class="two-columns"><div class="box warning-box"><h4>Небезпечно</h4><p><code>_books.RemoveAt(5)</code></p><p>Видалення за позицією 5, а не книги з <code>Id = 5</code>.</p></div><div class="box success-box"><h4>Правильно</h4><p><code>FindIndex(book =&gt; book.Id == id)</code></p><p>Пошук потрібного запису за його ідентичністю.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">29 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Контрольна зупинка 7: Діагностика помилки Delete" class="slide" data-section="6">
+<header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 11 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 7/8 <span>•</span> 3 БАЛИ</div><h2>Діагностика помилки Delete</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">У списку три книги. Розробник вирішив реалізувати <code>Delete(5)</code> викликом <code>_books.RemoveAt(5)</code>.</p>
+<table class="data-table"><thead><tr><th>Індекс у списку</th><th>Id</th><th>Назва</th></tr></thead><tbody><tr><td>0</td><td>1</td><td>Алгоритми</td></tr><tr><td>1</td><td>5</td><td>Основи C#</td></tr><tr><td>2</td><td>8</td><td>Структури даних</td></tr></tbody></table>
+<div class="box light-orange-box tight-box"><p><strong>Завдання:</strong> що відбудеться під час <code>RemoveAt(5)</code>? Який індекс книги з <code>Id = 5</code>? Як правильно реалізувати пошук для видалення?</p></div>
+<div class="answer-check"><button aria-expanded="false" class="answer-reveal" type="button">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Відповідь:</strong> <code>RemoveAt(5)</code> спричинить <code>ArgumentOutOfRangeException</code>: існують лише індекси 0, 1 і 2. Книга з <code>Id = 5</code> має <strong>індекс 1</strong>.</p><p><strong>Правильно:</strong> <code>int index = _books.FindIndex(b =&gt; b.Id == id);</code>, після чого перевірити <code>index != -1</code> й викликати <code>RemoveAt(index)</code>.</p><p><strong>Ключова ідея:</strong> <code>Id</code> сутності та індекс елемента в колекції — це різні речі.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">30 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 31: Наскрізний приклад: підготовка" class="slide" data-section="7">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Наскрізний приклад: підготовка</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">У консольному застосунку (.NET 6+) поєднуємо класи <code>Book</code>, <code>BookCatalog</code> і сценарій у <code>Main</code>.</p><pre><code class="language-csharp">#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+// Класи Book та BookCatalog — як на попередніх слайдах.
+
+public class Program
+{
+    public static void Main()
+    {
+        BookCatalog catalog = new BookCatalog();
+        // Далі викликаємо Create, Read, Update, Delete.
+    }
+}</code></pre><p><strong>Додаткових бібліотек і бази даних не потрібно.</strong></p>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">31 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 32: Сценарій: Create та Read" class="slide" data-section="7">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Сценарій: Create та Read</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Перша частина <code>Main()</code> створює дві книги та читає перший запис.</p><pre><code class="language-csharp">BookCatalog catalog = new BookCatalog();
+
+Book? first = catalog.Create("Алгоритми", "Олена Коваль");
+Book? second = catalog.Create("Алгоритми", "Марія Литвин");
+Console.WriteLine($"CREATE: {first}");
+Console.WriteLine($"CREATE: {second}");
+
+Console.WriteLine($"READ #1: {catalog.Read(1)}");</code></pre><div class="box light-blue-box tight-box"><p>Обидві книги мають однаковий <code>Title</code>, але різні <code>Id</code> — 1 і 2.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">32 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 33: Сценарій: Update та Delete" class="slide" data-section="7">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Сценарій: Update та Delete</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Продовження <code>Main()</code> змінює назву першої книги та вилучає другу.</p><pre><code class="language-csharp">bool updated = catalog.Update(
+    1, "Алгоритми та структури даних", "Олена Коваль");
+Console.WriteLine($"UPDATE #1: {updated}");
+Console.WriteLine($"READ #1: {catalog.Read(1)}");
+
+bool deleted = catalog.Delete(2);
+Console.WriteLine($"DELETE #2: {deleted}");
+Console.WriteLine($"READ #2: {catalog.Read(2)?.ToString() ?? "не знайдено"}");
+Console.WriteLine($"У каталозі: {catalog.ReadAll().Count}");
+Console.WriteLine($"Повторне видалення #2: {catalog.Delete(2)}");</code></pre><p><strong>Перевірте:</strong> що повертають <code>Read(2)</code> і повторний <code>Delete(2)</code>?</p>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">33 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 34: Очікуваний результат виконання" class="slide" data-section="7">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Очікуваний результат виконання</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Консоль відображає всі чотири CRUD-операції й коректну обробку відсутнього запису.</p><pre><code class="language-plaintext">CREATE: 1 | Алгоритми | Олена Коваль
+CREATE: 2 | Алгоритми | Марія Литвин
+READ #1: 1 | Алгоритми | Олена Коваль
+UPDATE #1: True
+READ #1: 1 | Алгоритми та структури даних | Олена Коваль
+DELETE #2: True
+READ #2: не знайдено
+У каталозі: 1
+Повторне видалення #2: False</code></pre><div class="box success-box tight-box"><p>Книга з <code>Id = 1</code> змінена; з <code>Id = 2</code> — вилучена. Невдале повторне видалення нічого не змінює.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">34 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 35: Мінімальні тести: Create / Read" class="slide" data-section="7">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Мінімальні тести: Create / Read</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Перевіряємо <strong>результат методу</strong> і <strong>стан колекції</strong>.</p><table class="data-table"><thead><tr><th>Ситуація</th><th>Виклик</th><th>Очікувано</th></tr></thead><tbody><tr><td>Коректне створення</td><td><code>Create("Алгоритми", "Автор")</code></td><td>Нова книга з унікальним <code>Id</code></td></tr><tr><td>Порожня назва</td><td><code>Create("  ", "Автор")</code></td><td><code>null</code>; список не змінився</td></tr><tr><td>Наявна книга</td><td><code>Read(1)</code></td><td>Книга № 1</td></tr><tr><td>Неіснуюча книга</td><td><code>Read(999)</code></td><td><code>null</code></td></tr></tbody></table><p class="note">Наявність методу ще не гарантує правильності його поведінки на крайових випадках.</p>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">35 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 36: Мінімальні тести: Update / Delete" class="slide" data-section="7">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Мінімальні тести: Update / Delete</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Важливо перевірити як успішні, так і невдалі операції.</p><table class="data-table"><thead><tr><th>Ситуація</th><th>Виклик</th><th>Очікувано</th></tr></thead><tbody><tr><td>Оновлення</td><td><code>Update(1, "Нова назва", "Автор")</code></td><td><code>true</code>; Id сталий</td></tr><tr><td>Некоректне оновлення</td><td><code>Update(1, " ", "Автор")</code></td><td><code>false</code>; стара назва</td></tr><tr><td>Видалення</td><td><code>Delete(1)</code>, <code>Read(1)</code></td><td><code>true</code>; потім <code>null</code></td></tr><tr><td>Повторне видалення</td><td><code>Delete(1)</code> вдруге</td><td><code>false</code></td></tr></tbody></table><div class="box light-blue-box tight-box"><p>У кожному тесті переконайтеся, що невдала операція <strong>не пошкодила дані</strong>.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">36 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Контрольна зупинка 8: Контрольний сценарій CRUD" class="slide" data-section="7">
+<header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 11 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 8/8 <span>•</span> 3 БАЛИ</div><h2>Контрольний сценарій CRUD</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Простежте стан <code>BookCatalog</code> після шести викликів. Новий каталог порожній, наступний <code>Id</code> — 1.</p>
+<pre><code class="language-csharp">var a = catalog.Create("A", "Автор");
+var b = catalog.Create("  ", "Автор");
+var c = catalog.Create("C", "Автор");
+var d = catalog.Delete(1);
+var e = catalog.Delete(1);
+var f = catalog.Read(2);</code></pre>
+<div class="box light-blue-box tight-box"><p><strong>Запишіть:</strong> <code>a?.Id</code>, <code>b is null</code>, <code>c?.Id</code>, <code>d</code>, <code>e</code> і <code>f?.Title</code>. Скільки книг залишиться?</p></div>
+<div class="answer-check"><button aria-expanded="false" class="answer-reveal" type="button">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Відповідь:</strong> <code>a?.Id = 1</code>; <code>b is null = true</code>; <code>c?.Id = 2</code>; <code>d = true</code>; <code>e = false</code>; <code>f?.Title = "C"</code>; кількість книг — <strong>1</strong>.</p><p>Причини: неуспішний <code>Create</code> не займає <code>Id</code>; успішний <code>Delete(1)</code> прибирає лише книгу № 1; повторне видалення повертає <code>false</code>.</p><p><strong>На що часто не зважають:</strong> після видалення книги № 1 книга № 2 продовжує існувати, тому <code>Read(2)</code> повертає книгу <code>"C"</code>.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">37 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 38: CRUD і розподіл відповідальностей" class="slide" data-section="8">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>CRUD і розподіл відповідальностей</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="three-columns">
+<div class="box"><h4>Book</h4><p>Модель сутності.</p><p class="metric-desc">Атрибути й перевірка коректності.</p></div>
+<div class="box light-blue-box"><h4>BookCatalog</h4><p>Операції CRUD.</p><p class="metric-desc">Керує списком і правилами пошуку.</p></div>
+<div class="box success-box"><h4>Main</h4><p>Сценарій викликів.</p><p class="metric-desc">Демонструє роботу каталогу.</p></div>
+</div>
+<div class="box primary-box"><p><strong>Перевага:</strong> CRUD можна перевіряти без меню, введення з клавіатури або графічного інтерфейсу.</p></div>
+<p>Наступна лекція — детально про SRP і поділ на <code>Model / Service / UI</code>.</p>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">38 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 39: Антипатерн: усе в одному місці" class="slide" data-section="8">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Антипатерн: усе в одному місці</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Коли введення користувача, валідація та зміна даних змішані, правила легко продублювати й порушити.</p><pre><code class="language-csharp">Console.Write("Назва: ");
+string title = Console.ReadLine() ?? "";
+if (!string.IsNullOrWhiteSpace(title))
+{
+    // Валідація, призначення Id та додавання книги
+    // безпосередньо поряд із кодом введення.
+}</code></pre><div class="two-columns"><div class="box warning-box"><h4>Лабораторна № 20</h4><p>Монолітний код без розділення відповідальностей.</p></div><div class="box success-box"><h4>Лабораторна № 22</h4><p>Повний CRUD-цикл в окремому класі.</p></div></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">39 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 40: Складність операцій для List&amp;lt;T&amp;gt;" class="slide" data-section="8">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Складність операцій для List&lt;T&gt;</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Нехай <code>n</code> — кількість записів у каталозі.</p><table class="data-table"><thead><tr><th>Операція</th><th>Типова складність</th><th>Причина</th></tr></thead><tbody><tr><td><code>Create</code></td><td>Амортизовано <code>O(1)</code></td><td>Додавання в кінець списку</td></tr><tr><td><code>Read(id)</code></td><td><code>O(n)</code></td><td>Лінійний пошук</td></tr><tr><td><code>Update(id)</code></td><td><code>O(n)</code></td><td>Пошук і заміна</td></tr><tr><td><code>Delete(id)</code></td><td><code>O(n)</code></td><td>Пошук та можливий зсув</td></tr><tr><td>Перебір</td><td><code>O(n)</code></td><td>Відвідуємо всі записи</td></tr></tbody></table><p class="note">Для невеликого навчального каталогу цього достатньо; вибір іншого сховища залежить від характеру доступу до даних.</p>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">40 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 41: Типові помилки реалізації CRUD" class="slide" data-section="8">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Типові помилки реалізації CRUD</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="vertical-flex">
+<div class="box tight-box"><strong class="primary-text">Плутанина індексу й Id</strong><p class="metric-desc">Позиція в списку не є ідентифікатором книги.</p></div>
+<div class="box tight-box"><strong class="primary-text">Read із побічним ефектом</strong><p class="metric-desc">Операція читання непомітно змінює каталог.</p></div>
+<div class="box tight-box"><strong class="primary-text">Відсутність валідації</strong><p class="metric-desc">До сховища потрапляють некоректні дані.</p></div>
+<div class="box tight-box"><strong class="primary-text">Публічний доступ до <code>List&lt;Book&gt;</code></strong><p class="metric-desc">Сторонній код обходить методи CRUD й порушує правила.</p></div>
+<div class="box tight-box"><strong class="primary-text">Ігнорування невдалих операцій</strong><p class="metric-desc">Необроблені відсутні записи і повторні запити.</p></div>
+</div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">41 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+
+<section aria-label="Слайд 42: Практичне завдання" class="slide" data-section="8">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Практичне завдання</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<p class="intro-text">Розширте консольний приклад і перевірте поведінку каталогу після таких дій:</p>
+<div class="vertical-flex">
+<div class="box tight-box"><strong class="primary-text">1. Некоректне оновлення</strong><p class="metric-desc">Спробуйте присвоїти порожню назву й перевірте незмінність початкових даних.</p></div>
+<div class="box tight-box"><strong class="primary-text">2. Пошук відсутнього Id</strong><p class="metric-desc">Спрогнозуйте результат <code>Read(999)</code>.</p></div>
+<div class="box tight-box"><strong class="primary-text">3. Новий запис після видалення</strong><p class="metric-desc">Створіть книгу після <code>Delete</code> і порівняйте ідентифікатори.</p></div>
+</div>
+<div class="box primary-box tight-box"><p><strong>Послідовність:</strong> прогноз → запуск → порівняння результату → пояснення, які інваріанти збережено.</p></div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">42 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+<section aria-label="Слайд 43: Підсумки лекції" class="slide" data-section="8">
+<header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 11</div><h2>Підсумки лекції</h2></header>
+<div class="slide-body legacy-slide-body"><div class="legacy-content">
+<div class="vertical-flex">
+<div class="box tight-box"><strong class="primary-text">Сутність</strong><p class="metric-desc">Має ідентичність, атрибути та правила коректності стану.</p></div>
+<div class="box tight-box"><strong class="primary-text">Життєвий цикл</strong><p class="metric-desc">Поява, доступність, зміна й вилучення зі сховища.</p></div>
+<div class="box tight-box"><strong class="primary-text">CRUD</strong><p class="metric-desc">Create, Read, Update, Delete — чотири базові операції з чіткими контрактами.</p></div>
+<div class="box tight-box"><strong class="primary-text">Підготовка до наступного кроку</strong><p class="metric-desc">Окремий клас для CRUD полегшує тестування та перехід до Model / Service / UI.</p></div>
+</div>
+</div></div>
+<footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">43 / 43</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer>
+</section>
+</div>
+<div aria-hidden="true" class="progress"><span></span></div>
+<div class="keyboard-hint">Керування: ← → / пробіл · O — усі слайди · F — повний екран</div>
+</main>
+<div class="overview" id="overview"><div class="overview-top"><span>Огляд усіх слайдів</span><button class="utility" id="close-overview" type="button">Закрити ×</button></div><div class="overview-items" id="overview-items"></div></div>
+<!-- Спільні скрипти лекцій 6–10 -->
+<script defer="" src="script.js"></script>
+<script defer="" src="oop.js"></script>
+</body>
+</html>

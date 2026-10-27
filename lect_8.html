@@ -1,96 +1,36 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="uk"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><meta content="#00828a" name="theme-color"/><title>Лекція 8. Динамічні структури: колекції List&lt;T&gt;, ітератор foreach — ООП</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="style.css" rel="stylesheet"/><link href="oop.css" rel="stylesheet"/><link href="highlight-theme.css" rel="stylesheet"/><script defer="" src="highlight.min.js"></script></head><body><main class="app"><header class="topbar"><div class="brandmark"><img alt="Герб Київського столичного університету імені Бориса Грінченка" class="university-logo" height="45" src="logo.png" width="36"/><span>Динамічні структури: колекції List&lt;T&gt;, ітератор foreach <small class="lecture-badge">· Лекція 8</small></span></div><div class="bar-actions"><button class="utility" id="overview-btn" title="Усі слайди (O)" type="button">☷ Огляд</button><button class="utility" id="fullscreen-btn" title="Повний екран (F)" type="button">⛶ Екран</button></div></header><div aria-label="Лекція 8. Динамічні структури: колекції List&lt;T&gt;, ітератор foreach" class="deck" id="deck"><section aria-label="Слайд 1: Лекція 8. Динамічні структури: колекції List&lt;T&gt;, ітератор foreach" class="slide title-slide active" data-section="8"><div class="title-content"><h1 class="old-title-heading">Лекція 8. Динамічні структури: колекції List&lt;T&gt;, ітератор foreach</h1><p class="title-subtitle">Модуль 3. Об’єктно-орієнтоване програмування</p><div class="title-rule"></div><div class="title-meta">
+<p><strong>Курс:</strong> Об'єктно-орієнтовне програмування</p>
+<p><strong>Спеціальність:</strong> F3 Комп’ютерні науки</p>
+<p>Київський столичний університет імені Бориса Грінченка</p>
+</div><div aria-hidden="true" class="hero-art"><div class="hero-ring a"></div><div class="hero-ring b"></div><div class="hero-ring c"></div><span>C#</span></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">01 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 2: План лекції" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">План лекції</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Лекція 8. Динамічні структури: колекції List<T>, ітератор foreach</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+<ol>
+<li>Проблематика: Межі можливостей статичних масивів.</li>
+<li>Вступ до колекцій та знайомство з <code>List&lt;T&gt;</code>.</li>
+<li>Анатомія <code>List&lt;T&gt;</code>: <code>Count</code> та <code>Capacity</code>.</li>
+<li>Базові операції керування даними.</li>
+<li>Цикл <code>foreach</code>: Безпечний обхід колекцій.</li>
+<li>Архітектурна практика: Списки у зв'язках класів (HAS-A).</li>
+</ol>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">02 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 3: 1. Проблема статичних масивів" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">1. Проблема статичних масивів</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-    <!-- Підключення Highlight.js для красивого форматування коду -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/tomorrow-night-blue.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-</head>
-
-<body>
-    <div class="presentation-container">
-
-        <!-- Slide 1: Title -->
-        <div class="slide active">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content title-slide-content">
-                <h1>Лекція 8. Динамічні структури: колекції List&lt;T&gt;, ітератор foreach</h1>
-                <p class="subtitle">Модуль 3. Об’єктно-орієнтоване програмування</p>
-                <div class="metadata">
-                    <p><strong>Курс:</strong> Об'єктно-орієнтовне програмування</p>
-                    <p><strong>Спеціальність:</strong> F3 Комп’ютерні науки</p>
-                    <p>Київський столичний університет імені Бориса Грінченка</p>
-                </div>
-            </div>
-            <div class="navigation">
-                <button class="btn" id="prevBtn" disabled>← Попередній</button>
-                <span class="slide-counter"><span class="current">1</span> / <span class="total">13</span></span>
-                <button class="btn" id="nextBtn" onclick="nextSlide()">Наступний →</button>
-            </div>
-        </div>
-
-        <!-- Slide 2: План лекції -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>План лекції</h2>
-                <ol>
-                    <li>Проблематика: Межі можливостей статичних масивів.</li>
-                    <li>Вступ до колекцій та знайомство з <code>List&lt;T&gt;</code>.</li>
-                    <li>Анатомія <code>List&lt;T&gt;</code>: <code>Count</code> та <code>Capacity</code>.</li>
-                    <li>Базові операції керування даними.</li>
-                    <li>Цикл <code>foreach</code>: Безпечний обхід колекцій.</li>
-                    <li>Архітектурна практика: Списки у зв'язках класів (HAS-A).</li>
-                </ol>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">2</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
-
-        <!-- Slide 3 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>1. Проблема статичних масивів</h2>
-                <ul>
-                    <li>Масиви надзвичайно швидкі та ефективні (безперервний блок пам'яті).</li>
-                    <li><strong>Головний недолік:</strong> жорстке обмеження фіксованого розміру.</li>
-                </ul>
-                <pre><code class="language-csharp">
+<ul>
+<li>Масиви надзвичайно швидкі та ефективні (безперервний блок пам'яті).</li>
+<li><strong>Головний недолік:</strong> жорстке обмеження фіксованого розміру.</li>
+</ul>
+<pre><code class="language-csharp">
 // Виділяємо пам'ять рівно під 3 елементи. Не більше!
 string[] students = new string[3];
 </code></pre>
-                <p>Для додавання 4-го елемента доведеться створювати новий масив, копіювати туди всі дані та
+<p>Для додавання 4-го елемента доведеться створювати новий масив, копіювати туди всі дані та
                     переприсвоювати посилання.</p>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">3</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">03 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 4: 2. Еволюція: Проблема ArrayList" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">2. Еволюція: Проблема ArrayList</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 4 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>2. Еволюція: Проблема ArrayList</h2>
-                <p>Раніше використовували <code>ArrayList</code>. Він міг змінювати розмір, але зберігав дані як
+<p>Раніше використовували <code>ArrayList</code>. Він міг змінювати розмір, але зберігав дані як
                     <code>System.Object</code>.
                 </p>
-                <pre><code class="language-csharp">
+<pre><code class="language-csharp">
 ArrayList list = new ArrayList();
 list.Add(3);            // Пакування (Boxing): int перетворюється на Object
 list.Add("Hello");      // Рядок також стає Object
@@ -101,24 +41,13 @@ foreach (int x in list)
     sum += x; // АВАРІЯ! InvalidCastException (Рядок не стане числом)
 }
 </code></pre>
-                <p style="color: #e74c3c; font-weight: bold;">Наслідки: відсутність безпеки типів, падіння швидкодії
+<p class="inline-rule-11">Наслідки: відсутність безпеки типів, падіння швидкодії
                     через постійне пакування та розпакування (Boxing/Unboxing).</p>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">4</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">04 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 5: Рішення: Узагальнення (Generics)" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">Рішення: Узагальнення (Generics)</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 5 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>Рішення: Узагальнення (Generics)</h2>
-                <p><code>List&lt;T&gt;</code> — це сучасний строго типізований список. <br>Літера <code>&lt;T&gt;</code>
+<p><code>List&lt;T&gt;</code> — це сучасний строго типізований список. <br/>Літера <code>&lt;T&gt;</code>
                     означає <em>Type parameter</em> (параметр типу).</p>
-                <pre><code class="language-csharp">
+<pre><code class="language-csharp">
 // Строга типізація: приймає ТІЛЬКИ цілі числа
 List&lt;int&gt; numbers = new List&lt;int&gt;();
 numbers.Add(10); 
@@ -130,24 +59,13 @@ List&lt;string&gt; cities = new List&lt;string&gt; { "Київ", "Львів" };
 // Дістаємо елемент без жодного приведення типів
 string capital = cities[0]; 
 </code></pre>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">5</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">05 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 6: 3. Анатомія List&lt;T&gt;: Count та Capacity" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">3. Анатомія List&lt;T&gt;: Count та Capacity</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 6 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>3. Анатомія List&lt;T&gt;: Count та Capacity</h2>
-                <ul>
-                    <li><strong><code>Count</code></strong> — фактична кількість елементів у списку.</li>
-                    <li><strong><code>Capacity</code></strong> — фізичний розмір внутрішнього масиву (місткість).</li>
-                </ul>
-                <pre><code class="language-csharp">
+<ul>
+<li><strong><code>Count</code></strong> — фактична кількість елементів у списку.</li>
+<li><strong><code>Capacity</code></strong> — фізичний розмір внутрішнього масиву (місткість).</li>
+</ul>
+<pre><code class="language-csharp">
 List&lt;int&gt; numbers = new List&lt;int&gt;();
 // Count: 0, Capacity: 0
 
@@ -160,42 +78,20 @@ numbers.Add(2); numbers.Add(3); numbers.Add(4);
 numbers.Add(5); // Переповнення!
 // Count: 5, Capacity: 8 (місткість ПОДВОЇЛАСЯ: 4 * 2)
 </code></pre>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">6</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">06 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 7: Як працює автоматичне розширення" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">Як працює автоматичне розширення</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 7 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>Як працює автоматичне розширення</h2>
-                <ol>
-                    <li>Список створює новий внутрішній масив вдвічі більшого розміру.</li>
-                    <li>Усі існуючі елементи швидко копіюються зі старого масиву в новий.</li>
-                    <li>Старий масив відкидається (знищується збирачем сміття).</li>
-                    <li>Новий елемент додається у першу вільну комірку.</li>
-                </ol>
-                <p style="color: #2ecc71; font-weight: bold; margin-top: 20px;">Порада щодо оптимізації:</p>
-                <p>Використовуйте <code>new List&lt;int&gt;(1000)</code>, якщо заздалегідь знаєте кількість елементів,
+<ol>
+<li>Список створює новий внутрішній масив вдвічі більшого розміру.</li>
+<li>Усі існуючі елементи швидко копіюються зі старого масиву в новий.</li>
+<li>Старий масив відкидається (знищується збирачем сміття).</li>
+<li>Новий елемент додається у першу вільну комірку.</li>
+</ol>
+<p class="inline-rule-12">Порада щодо оптимізації:</p>
+<p>Використовуйте <code>new List&lt;int&gt;(1000)</code>, якщо заздалегідь знаєте кількість елементів,
                     щоб уникнути постійного подвоєння масиву та копіювання даних.</p>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">7</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">07 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 8: 4. Базові операції керування даними" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">4. Базові операції керування даними</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 8 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>4. Базові операції керування даними</h2>
-                <pre><code class="language-csharp">
+<pre><code class="language-csharp">
 List&lt;string&gt; planets = new List&lt;string&gt; { "Венера", "Марс" };
 
 // ДОДАВАННЯ ТА ВСТАВКА
@@ -211,22 +107,11 @@ planets.Remove("Венера"); // Видалення за значенням (�
 planets.RemoveAt(0);      // Видалення за конкретним індексом
 planets.Clear();          // Очистити весь список (Count стане 0)
 </code></pre>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">8</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">08 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 9: 5. Ітератор foreach: Безпечний обхід" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">5. Ітератор foreach: Безпечний обхід</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 9 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>5. Ітератор foreach: Безпечний обхід</h2>
-                <p>Спеціальний цикл для перебору колекцій від початку до кінця без необхідності управління індексами.
+<p>Спеціальний цикл для перебору колекцій від початку до кінця без необхідності управління індексами.
                 </p>
-                <pre><code class="language-csharp">
+<pre><code class="language-csharp">
 List&lt;string&gt; languages = new List&lt;string&gt; { "C#", "Java", "Python" };
 
 foreach (string lang in languages) 
@@ -234,24 +119,13 @@ foreach (string lang in languages)
     Console.WriteLine($"Мова програмування: {lang}");
 }
 </code></pre>
-                <p>На відміну від циклу <code>for</code>, він повністю унеможливлює помилку виходу за межі масиву
+<p>На відміну від циклу <code>for</code>, він повністю унеможливлює помилку виходу за межі масиву
                     (<code>IndexOutOfRangeException</code>) і робить код чистішим.</p>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">9</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">09 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 10: Критичне правило безпеки foreach" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">Критичне правило безпеки foreach</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 10 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>Критичне правило безпеки foreach</h2>
-                <p style="color: #e74c3c; font-weight: bold;">Категорично заборонено змінювати структуру колекції
+<p class="inline-rule-11">Категорично заборонено змінювати структуру колекції
                     (додавати або видаляти елементи) безпосередньо під час її обходу циклом <code>foreach</code>.</p>
-                <pre><code class="language-csharp">
+<pre><code class="language-csharp">
 List&lt;int&gt; numbers = new List&lt;int&gt; { 1, 2, 3, 4, 5 };
 
 foreach (int num in numbers) {
@@ -260,23 +134,12 @@ foreach (int num in numbers) {
     }
 }
 </code></pre>
-                <p>Для видалення елементів за умовою всередині циклу використовуйте звичайний <code>for</code> із
+<p>Для видалення елементів за умовою всередині циклу використовуйте звичайний <code>for</code> із
                     зворотним відліком (від кінця до початку).</p>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">10</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">10 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 11: 6. Архітектура: Списки у зв'язках класів (HAS-A)" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">6. Архітектура: Списки у зв'язках класів (HAS-A)</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 11 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>6. Архітектура: Списки у зв'язках класів (HAS-A)</h2>
-                <p>Реалізація відношення <strong>«один-до-багатьох»</strong> з дотриманням інкапсуляції.</p>
-                <pre><code class="language-csharp">
+<p>Реалізація відношення <strong>«один-до-багатьох»</strong> з дотриманням інкапсуляції.</p>
+<pre><code class="language-csharp">
 class Department {
     public string Name { get; set; }
     
@@ -295,74 +158,29 @@ class Department {
     }
 }
 </code></pre>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">11</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">11 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 12: 7. Підсумки" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">7. Підсумки</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 12 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content">
-                <h2>7. Підсумки</h2>
-                <ul>
-                    <li><code>List&lt;T&gt;</code> знімає обмеження фіксованого розміру статичних масивів.</li>
-                    <li>Узагальнення (Generics, <code>&lt;T&gt;</code>) гарантують безпеку типів на етапі компіляції та
+<ul>
+<li><code>List&lt;T&gt;</code> знімає обмеження фіксованого розміру статичних масивів.</li>
+<li>Узагальнення (Generics, <code>&lt;T&gt;</code>) гарантують безпеку типів на етапі компіляції та
                         рятують від <code>InvalidCastException</code>.</li>
-                    <li>Відсутність <code>Boxing/Unboxing</code> значно економить пам'ять та час процесора.</li>
-                    <li>Властивість <code>Count</code> — це реальні дані, а <code>Capacity</code> — зарезервована
+<li>Відсутність <code>Boxing/Unboxing</code> значно економить пам'ять та час процесора.</li>
+<li>Властивість <code>Count</code> — це реальні дані, а <code>Capacity</code> — зарезервована
                         внутрішнім масивом пам'ять.</li>
-                    <li>Не модифікуйте колекцію всередині <code>foreach</code>.</li>
-                    <li>Завжди ховайте списки під модифікатор <code>private</code> в архітектурі ваших класів.</li>
-                </ul>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">12</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn">Наступний →</button>
-            </div>
-        </div>
+<li>Не модифікуйте колекцію всередині <code>foreach</code>.</li>
+<li>Завжди ховайте списки під модифікатор <code>private</code> в архітектурі ваших класів.</li>
+</ul>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">12 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section><section aria-label="Слайд 13: Блок запитань" class="slide" data-section="8"><header class="slide-header"><div class="eyebrow">ООП<span> • </span>ЛЕКЦІЯ 8</div><h2 class="">Блок запитань</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content">
 
-        <!-- Slide 13 -->
-        <div class="slide">
-            <img src="logo.png" alt="КСУ ім. Б. Грінченка" class="university-logo">
-            <div class="content title-slide-content">
-                <h2>Блок запитань</h2>
-                <ol style="text-align: left; max-width: 800px; margin: 30px auto; font-size: 1.1em; line-height: 1.6;">
-                    <li>Чим сучасна колекція <code>List&lt;T&gt;</code> краща за застарілу <code>ArrayList</code>?</li>
-                    <li>Що відбувається у пам'яті комп'ютера, коли <code>Count</code> наздоганяє <code>Capacity</code>?
+<ol class="inline-rule-13">
+<li>Чим сучасна колекція <code>List&lt;T&gt;</code> краща за застарілу <code>ArrayList</code>?</li>
+<li>Що відбувається у пам'яті комп'ютера, коли <code>Count</code> наздоганяє <code>Capacity</code>?
                     </li>
-                    <li>Яку помилку і чому викидає програма під час спроби видалити елемент усередині ітерації
+<li>Яку помилку і чому викидає програма під час спроби видалити елемент усередині ітерації
                         <code>foreach</code>?
                     </li>
-                    <li>Чому краще робити поля типу <code>List</code> приватними (інкапсульованими) в архітектурі
+<li>Чому краще робити поля типу <code>List</code> приватними (інкапсульованими) в архітектурі
                         класів, а не публічними?</li>
-                </ol>
-                <h3 style="margin-top: 50px;">Дякую за увагу!</h3>
-            </div>
-            <div class="navigation">
-                <button class="btn prevBtn">← Попередній</button>
-                <span class="slide-counter"><span class="current">13</span> / <span class="total">13</span></span>
-                <button class="btn nextBtn" disabled>Наступний →</button>
-            </div>
-        </div>
-
-    </div>
-
-
-    <script src="script.js"></script>
-
-    <!-- Ініціалізація підсвічування синтаксису -->
-    <script>
-        document.addEventListener('DOMContentLoaded', (event) => {
-            document.querySelectorAll('pre code').forEach((el) => {
-                hljs.highlightElement(el);
-            });
-        });
-    </script>
-</body>
-
-</html>
+</ol>
+<h3 class="inline-rule-14">Дякую за увагу!</h3>
+</div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button aria-label="Попередній слайд" class="nav-btn prev" title="Назад (←)" type="button">←</button><span class="counter">13 / 13</span><button aria-label="Наступний слайд" class="nav-btn next" title="Далі (→)" type="button">→</button></div></footer></section></div><div class="progress"><span></span></div><div class="keyboard-hint">Керування: ← → / пробіл · O — усі слайди · F — повний екран</div></main><div class="overview" id="overview"><div class="overview-top"><span>Огляд усіх слайдів</span><button class="utility" id="close-overview" type="button">Закрити ×</button></div><div class="overview-items" id="overview-items"></div></div><script defer="" src="script.js"></script><script defer="" src="oop.js"></script></body></html>
