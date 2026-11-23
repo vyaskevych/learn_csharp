@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="theme-color" content="#00828a"/>
+<title>Лекція 15. Інтеграція: підключення бізнес-логіки до графічного інтерфейсу — ООП</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="style.css"/>
+<link rel="stylesheet" href="oop.css"/>
+<link rel="stylesheet" href="highlight-theme.css"/>
+<script src="highlight.min.js" defer></script>
+</head>
+<body>
+<main class="app">
+<header class="topbar">
+<div class="brandmark"><img class="university-logo" src="logo.png" alt="Герб університету" width="36" height="45"/><span>Інтеграція: підключення бізнес-логіки до GUI <small class="lecture-badge">· Лекція 15</small></span></div>
+<div class="bar-actions"><button type="button" class="utility" id="overview-btn" title="Усі слайди (O)">☷ Огляд</button><button type="button" class="utility" id="fullscreen-btn" title="Повний екран (F)">⛶ Екран</button></div>
+</header>
+<div class="deck" id="deck" aria-label="Лекція 15. Інтеграція: підключення бізнес-логіки до графічного інтерфейсу">
+<section class="slide title-slide active" data-section="15" aria-label="Титульний слайд"><div class="title-content"><h1 class="old-title-heading">Лекція 15. Інтеграція: підключення бізнес-логіки до графічного інтерфейсу</h1><p class="title-subtitle">Модуль 6. Подійно-орієнтоване програмування</p><div class="title-rule"></div><div class="title-meta"><p><strong>Курс:</strong> Об’єктно-орієнтоване програмування</p><p><strong>Спеціальність:</strong> F3 Комп’ютерні науки</p><p>Київський столичний університет імені Бориса Грінченка</p></div><div class="hero-art" aria-hidden="true"><div class="hero-ring a"></div><div class="hero-ring b"></div><div class="hero-ring c"></div><span>C#</span></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">01 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="1" aria-label="Слайд 2: Навчальні результати"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Навчальні результати</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">Завершуємо наскрізний проєкт Лекцій 11–13: підключаємо готовий <code>BookCatalog</code> до вікна Windows Forms.</p>
+<ul class="standard-list">
+<li>Переносити готові <code>Book</code> і <code>BookCatalog</code> із Лекцій 11–12 до Windows Forms без зміни логіки CRUD.</li>
+<li>Пояснювати роль <code>MainForm</code> як нового шару UI замість <code>ConsoleView</code>.</li>
+<li>Зберігати єдиний екземпляр <code>BookCatalog</code> у полі форми протягом її роботи.</li>
+<li>Зберігати об’єкти <code>Book</code> у <code>ListBox</code>, читати <code>SelectedItem</code> і керувати доступністю кнопок.</li>
+<li>Розмежовувати перевірку формату (<code>int.TryParse</code> у UI для пошуку за <code>Id</code>) та контракти сервісу (<code>Book?</code>, <code>bool</code>).</li>
+<li>Синхронізувати <code>ListBox</code> із каталогом після <code>Create</code>, <code>Update</code> і <code>Delete</code>, враховуючи незмінюваність <code>Book</code>.</li>
+</ul></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">02 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="1" aria-label="Слайд 3: План лекції"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>План лекції</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="roadmap">
+<div class="road"><span class="road-no">01</span><span><strong>Архітектура GUI</strong><small>Від ConsoleView (Л12) до MainForm (Л15)</small></span></div>
+<div class="road"><span class="road-no">02</span><span><strong>Підготовка форми</strong><small>BookCatalogWinForms, компоненти й макет</small></span></div>
+<div class="road"><span class="road-no">03</span><span><strong>Етап 1: Каталог</strong><small>Поле _catalog, RefreshList() і MainForm_Load</small></span></div>
+<div class="road"><span class="road-no">04</span><span><strong>Етап 2: Create і Read</strong><small>btnAdd_Click і пошук за Id (btnFind_Click)</small></span></div>
+<div class="road"><span class="road-no">05</span><span><strong>Етап 3: Update і Delete</strong><small>SelectedIndexChanged, незмінюваний Book, стан кнопок</small></span></div>
+<div class="road"><span class="road-no">06</span><span><strong>Помилки та місток до лаб.</strong><small>Діагностика, налагодження, зв’язок із ProductService</small></span></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">03 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 4: Еволюція наскрізного проєкту (Лекції 11–15)"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Еволюція проєкту: Лекції 11 → 15</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="flow-steps">
+<div class="flow-step"><strong>Лекція 11</strong><small>Book і BookCatalog (CRUD у пам’яті)</small></div>
+<div class="flow-step"><strong>Лекція 12</strong><small>SRP і новий ConsoleView</small></div>
+<div class="flow-step"><strong>Лекції 13–14</strong><small>WinForms: компоненти, події, State</small></div>
+<div class="flow-step"><strong>Лекція 15</strong><small>Інтеграція BookCatalog + MainForm</small></div>
+</div>
+<div class="box primary-box tight-box"><p><strong>Обіцянка Лекції 13 виконана:</strong> там ми створили прототип вікна без сервісу, а тепер підключаємо реальний <code>BookCatalog</code> без переписування жодного CRUD-методу.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">04 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 5: Заміна UI без зміни бізнес-логіки"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Заміна UI без зміни бізнес-логіки</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Графічна форма — це <strong>інший спосіб взаємодії з користувачем</strong>, а не переписування логіки каталогу.</p>
+<div class="box tight-box"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 310" width="100%" style="max-height:22cqw;display:block;margin:0 auto" role="img" aria-label="Порівняння архітектури Лекції 12 та Лекції 15">
+  <defs>
+    <marker id="arr15a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#244c61"/>
+    </marker>
+  </defs>
+  <text x="200" y="24" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="15" font-weight="700" fill="#567">Лекція 12 (Консоль)</text>
+  <rect x="65" y="38" width="270" height="72" rx="10" fill="#fff4e6" stroke="#d99a4e" stroke-width="2"/>
+  <text x="200" y="65" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="700" fill="#9a5600">ConsoleView</text>
+  <text x="200" y="88" text-anchor="middle" font-family="Consolas, monospace" font-size="13" fill="#6b4414">Меню, ReadLine / WriteLine</text>
+  <line x1="200" y1="110" x2="200" y2="146" stroke="#244c61" stroke-width="2" marker-end="url(#arr15a)"/>
+  <text x="212" y="133" font-family="Montserrat, Arial, sans-serif" font-size="12" fill="#466d80">викликає</text>
+  <rect x="65" y="150" width="270" height="66" rx="10" fill="#e2f2f4" stroke="#00828a" stroke-width="2"/>
+  <text x="200" y="177" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="700" fill="#00666c">BookCatalog (Service)</text>
+  <text x="200" y="199" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13" fill="#244c61">Create · Read · ReadAll · Update · Delete</text>
+  <line x1="200" y1="216" x2="200" y2="246" stroke="#244c61" stroke-width="2" marker-end="url(#arr15a)"/>
+  <rect x="115" y="250" width="170" height="44" rx="8" fill="#f4f8fa" stroke="#95b3c5" stroke-width="2"/>
+  <text x="200" y="277" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="15" font-weight="700" fill="#244c61">Book (Model)</text>
+
+  <rect x="358" y="54" width="104" height="38" rx="19" fill="#00828a"/>
+  <text x="410" y="78" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700" fill="#ffffff">Заміна UI →</text>
+  <rect x="358" y="164" width="104" height="38" rx="19" fill="#eaf6ee" stroke="#2f855a" stroke-width="1.5"/>
+  <text x="410" y="188" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13" font-weight="700" fill="#226644">Без змін</text>
+
+  <text x="620" y="24" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="15" font-weight="700" fill="#00828a">Лекція 15 (Windows Forms)</text>
+  <rect x="485" y="38" width="270" height="72" rx="10" fill="#e8f3fb" stroke="#3b82b6" stroke-width="2"/>
+  <text x="620" y="65" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="700" fill="#1b547d">MainForm</text>
+  <text x="620" y="88" text-anchor="middle" font-family="Consolas, monospace" font-size="13" fill="#244c61">ListBox / TextBox / Button / Label</text>
+  <line x1="620" y1="110" x2="620" y2="146" stroke="#244c61" stroke-width="2" marker-end="url(#arr15a)"/>
+  <text x="632" y="133" font-family="Montserrat, Arial, sans-serif" font-size="12" fill="#466d80">викликає</text>
+  <rect x="485" y="150" width="270" height="66" rx="10" fill="#e2f2f4" stroke="#00828a" stroke-width="2"/>
+  <text x="620" y="177" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="16" font-weight="700" fill="#00666c">BookCatalog (Service)</text>
+  <text x="620" y="199" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13" fill="#244c61">Той самий код із Лекції 11</text>
+  <line x1="620" y1="216" x2="620" y2="246" stroke="#244c61" stroke-width="2" marker-end="url(#arr15a)"/>
+  <rect x="535" y="250" width="170" height="44" rx="8" fill="#f4f8fa" stroke="#95b3c5" stroke-width="2"/>
+  <text x="620" y="277" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="15" font-weight="700" fill="#244c61">Book (Model)</text>
+</svg></div>
+<div class="box success-box tight-box"><p>Класи <code>Book.cs</code> і <code>BookCatalog.cs</code> переносяться з Лекцій 11–12 без змін (узгоджується лише <code>namespace</code>); замість <code>ConsoleView</code> працює <code>MainForm</code>.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">05 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 6: Звіряємо готовий контракт Book і BookCatalog"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Готовий контракт Book і BookCatalog (Л11–12)</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">Методи сервісу не знають про <code>Console</code> чи <code>Form</code> — вони працюють лише з даними й типами C#.</p>
+<pre class="code-block"><code class="language-csharp">// Модель Book — незмінювана (лише get):
+public int Id { get; }
+public string Title { get; }
+public string Author { get; }
+public override string ToString() =&gt; $&quot;{Id} | {Title} | {Author}&quot;;
+
+// Сервіс BookCatalog — 5 операцій CRUD:
+Book? Create(string title, string author);
+Book? Read(int id);
+IReadOnlyList&lt;Book&gt; ReadAll();
+bool Update(int id, string newTitle, string newAuthor);
+bool Delete(int id);</code></pre></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">06 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 7: Одна операція — два інтерфейси"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Одна операція — два інтерфейси</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">Обидва шари представлення однаково інтерпретують контракти <code>Book?</code> і <code>bool</code>.</p>
+<div class="two-columns">
+<div class="box light-orange-box"><h4>ConsoleView (Лекція 12)</h4><ul class="standard-list"><li>Зчитує <code>title</code> і <code>author</code> через <code>Console.ReadLine()</code>.</li><li>Парсить <code>Id</code> у <code>ReadId()</code> через <code>int.TryParse</code>.</li><li>Викликає методи <code>_catalog</code>.</li><li>Друкує результат через <code>Console.WriteLine()</code>.</li></ul></div>
+<div class="box light-blue-box"><h4>MainForm (Лекція 15)</h4><ul class="standard-list"><li>Зчитує <code>txtTitle.Text</code>, <code>txtAuthor.Text</code>.</li><li>Парсить <code>txtSearchId.Text</code> через <code>int.TryParse</code>.</li><li>Викликає ті самі методи <code>_catalog</code>.</li><li>Оновлює <code>lstBooks</code> і <code>lblStatus</code>.</li></ul></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">07 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 8: Стан форми: де живе BookCatalog?"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Стан форми: де живе BookCatalog?</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>У Лекції 14 ми зберігали в полі форми лічильник. Тепер поле форми зберігає <strong>посилання на екземпляр сервісу</strong>:</p>
+<pre class="code-block"><code class="language-csharp">public partial class MainForm : Form
+{
+    private readonly BookCatalog _catalog = new BookCatalog();
+}</code></pre>
+<div class="two-columns">
+<div class="box success-box"><h4>Один екземпляр у полі форми</h4><p>Створений один раз при відкритті <code>MainForm</code>; усі обробники <code>Click</code> працюють зі спільною колекцією книг.</p></div>
+<div class="box light-blue-box"><h4>Альтернатива (з Лекції 12)</h4><p>Передати <code>BookCatalog</code> у конструктор <code>MainForm(BookCatalog catalog)</code> із <code>Program.cs</code> — аналогічно <code>ConsoleView(catalog)</code>.</p></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">08 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 9: Помилка: new BookCatalog() у кожному Click"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Помилка: new BookCatalog() у кожному Click</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="two-columns">
+<div class="box warning-box"><h4>Неправильно (локальна змінна)</h4><pre class="code-block"><code class="language-csharp">private void btnAdd_Click(...)
+{
+    var catalog = new BookCatalog();
+    catalog.Create(title, author);
+} // після Click каталог зникає!</code></pre></div>
+<div class="box success-box"><h4>Правильно (поле форми)</h4><pre class="code-block"><code class="language-csharp">private readonly BookCatalog _catalog
+    = new BookCatalog();
+
+private void btnAdd_Click(...)
+{
+    _catalog.Create(title, author);
+}</code></pre></div>
+</div>
+<div class="box primary-box tight-box"><p>Згадайте Лекцію 12 (слайд 42): два окремі <code>new BookCatalog()</code> мають незалежні списки <code>_books</code> і лічильники <code>_nextId</code>.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">09 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 10: Розподіл відповідальностей між UI та Service"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Розподіл відповідальностей: MainForm vs BookCatalog</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="table-wrap"><table class="slide-table compact">
+<thead><tr><th>Завдання</th><th>MainForm (UI)</th><th>BookCatalog (Service)</th></tr></thead>
+<tbody>
+<tr><td>Отримання вводу</td><td><code>txtTitle.Text</code>, <code>txtAuthor.Text</code>, <code>txtSearchId.Text</code></td><td>Не знає про елементи форми</td></tr>
+<tr><td>Перевірка формату числа</td><td><code>int.TryParse</code> + <code>id &gt; 0</code> для пошуку</td><td>Приймає готовий <code>int id</code></td></tr>
+<tr><td>Перевірка правил сутності</td><td>Не дублює інваріанти моделі</td><td>Валідує поля, зберігає <code>_nextId</code></td></tr>
+<tr><td>Операції CRUD</td><td>Викликає методи <code>_catalog</code></td><td>Змінює приватний <code>List&lt;Book&gt;</code></td></tr>
+<tr><td>Повідомлення користувачу</td><td><code>lblStatus</code>, <code>lstBooks</code>, <code>MessageBox</code></td><td>Повертає <code>Book?</code>, <code>IReadOnlyList&lt;Book&gt;</code>, <code>bool</code></td></tr>
+</tbody></table></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">10 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 11: Єдине джерело даних: BookCatalog, а не ListBox"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Єдине джерело даних: BookCatalog, а не ListBox</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Колекція <code>lstBooks.Items</code> — лише поточне <strong>відображення</strong> каталогу. Навіть більше: у Лекції 11 <code>Book</code> є незмінюваним, і <code>Update()</code> <strong>замінює екземпляр</strong> у <code>_books</code>.</p>
+<div class="flow-steps">
+<div class="flow-step"><strong>1. CRUD у Service</strong><small>Create / Update / Delete</small></div>
+<div class="flow-step"><strong>2. RefreshList()</strong><small>Перечитати _catalog.ReadAll()</small></div>
+<div class="flow-step"><strong>3. ResetEditor()</strong><small>Скинути вибір і поля</small></div>
+<div class="flow-step"><strong>4. Узгоджений UI</strong><small>Нові екземпляри Book у ListBox</small></div>
+</div>
+<div class="box warning-box tight-box"><p>Якщо не викликати <code>RefreshList()</code> після <code>Update()</code>, то <code>lstBooks</code> продовжить відображати <strong>старий екземпляр <code>Book</code></strong> із попередньою назвою!</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">11 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="2" aria-label="Слайд 12: Контрольна зупинка 1/6: джерело даних"><header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 15 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 1/6</div><h2>Чому не можна додавати книгу лише в lstBooks?</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">Студент написав у <code>btnAdd_Click</code> рядок <code>lstBooks.Items.Add($"{txtTitle.Text} — {txtAuthor.Text}");</code> без виклику <code>_catalog.Create(...)</code>. Які наслідки?</p>
+<div class="two-columns">
+<div class="box tight-box"><p><strong>A.</strong> Програма автоматично оновить <code>BookCatalog</code>.</p><p><strong>B.</strong> Книга не отримає <code>Id</code>, не потрапить у <code>_catalog</code> і зникне після <code>RefreshList()</code>.</p></div>
+<div class="box tight-box"><p><strong>C.</strong> Виникне помилка компіляції.</p><p><strong>D.</strong> Помилки немає, бо <code>ListBox</code> зберігає дані замість сервісу.</p></div>
+</div>
+<div class="answer-check"><button type="button" class="answer-reveal" aria-expanded="false">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Правильна відповідь: B.</strong> <code>lstBooks</code> лише відображає вміст <code>BookCatalog</code>. Без <code>_catalog.Create(...)</code> запис не існує у сховищі, його не знайде <code>Read(id)</code> і він зникне при синхронізації.</p></div></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">12 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="3" aria-label="Слайд 13: Підготовка проєкту BookCatalogWinForms"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Підготовка проєкту BookCatalogWinForms</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">Продовжуємо проєкт <code>BookCatalogWinForms</code> із Лекції 13 (або створюємо новий на <strong>.NET 10</strong>).</p>
+<div class="vertical-flex">
+<div class="box tight-box"><strong class="primary-text">1. Перенесіть готові файли</strong><p class="metric-desc">Скопіюйте <code>Book.cs</code> і <code>BookCatalog.cs</code> із Лекцій 11–12; змініть лише <code>namespace</code> на <code>BookCatalogWinForms</code>.</p></div>
+<div class="box tight-box"><strong class="primary-text">2. Налаштуйте головну форму</strong><p class="metric-desc">Назвіть клас форми <code>MainForm</code> і перевірте виклик <code>Application.Run(new MainForm());</code> у <code>Program.cs</code>.</p></div>
+<div class="box tight-box"><strong class="primary-text">3. Розмістіть компоненти у Designer</strong><p class="metric-desc">Блок пошуку за <code>Id</code> угорі, <code>lstBooks</code> ліворуч, поля й 4 кнопки праворуч, <code>lblStatus</code> унизу.</p></div>
+<div class="box tight-box"><strong class="primary-text">4. Прив’яжіть події через Properties → Events (⚡)</strong><p class="metric-desc">Підключіть <code>Load</code>, <code>SelectedIndexChanged</code> і <code>Click</code> усіх кнопок; <code>MainForm.Designer.cs</code> вручну не редагуйте.</p></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">13 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="3" aria-label="Слайд 14: Структура проєкту та Program.cs"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Структура проєкту та Program.cs</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="two-columns">
+<div><h4>Файли проєкту</h4><pre class="code-block"><code class="language-plaintext">BookCatalogWinForms/
+├── Program.cs
+├── Book.cs            // Model (з Л11 — без змін)
+├── BookCatalog.cs     // Service (з Л11 — без змін)
+└── MainForm.cs        // Новий GUI (замість ConsoleView)
+    └── MainForm.Designer.cs</code></pre></div>
+<div><h4>Точка входу Program.cs</h4><pre class="code-block"><code class="language-csharp">using System;
+using System.Windows.Forms;
+
+namespace BookCatalogWinForms;
+
+internal static class Program
+{
+    [STAThread]
+    private static void Main()
+    {
+        ApplicationConfiguration.Initialize();
+        Application.Run(new MainForm());
+    }
+}</code></pre></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">14 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="3" aria-label="Слайд 15: Компоненти форми MainForm"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Компоненти форми MainForm</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="table-wrap"><table class="slide-table compact">
+<thead><tr><th>Компонент</th><th>Name</th><th>Призначення та подія</th></tr></thead>
+<tbody>
+<tr><td><code>TextBox</code> / <code>Button</code></td><td><code>txtSearchId</code>, <code>btnFind</code></td><td>Пошук книги за <code>Id</code>; подія <code>Click</code></td></tr>
+<tr><td><code>ListBox</code></td><td><code>lstBooks</code></td><td>Список об’єктів <code>Book</code>; <code>SelectedIndexChanged</code></td></tr>
+<tr><td><code>TextBox</code></td><td><code>txtTitle</code>, <code>txtAuthor</code></td><td>Назва та автор книги</td></tr>
+<tr><td><code>Button</code></td><td><code>btnAdd</code></td><td>Додати нову книгу; <code>Click</code></td></tr>
+<tr><td><code>Button</code></td><td><code>btnUpdate</code></td><td>Оновити вибрану книгу; <code>Click</code></td></tr>
+<tr><td><code>Button</code></td><td><code>btnDelete</code></td><td>Видалити вибрану книгу; <code>Click</code></td></tr>
+<tr><td><code>Button</code></td><td><code>btnClear</code></td><td>Очистити редактор і пошук; <code>Click</code></td></tr>
+<tr><td><code>Label</code></td><td><code>lblStatus</code></td><td>Статус операції та повідомлення про помилки</td></tr>
+</tbody></table></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">15 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="3" aria-label="Слайд 16: Макет інтерфейсу «Каталог книг»"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Макет інтерфейсу «Каталог книг»</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="box tight-box"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 390" width="100%" style="max-height:22.5cqw;display:block;margin:0 auto" role="img" aria-label="Макет форми MainForm Каталог книг">
+  <rect x="4" y="4" width="772" height="380" rx="12" fill="#ffffff" stroke="#95b3c5" stroke-width="2"/>
+  <path d="M16 4 H764 Q776 4 776 16 V40 H4 V16 Q4 4 16 4 Z" fill="#e2f2f4"/>
+  <text x="22" y="28" font-family="Montserrat, Arial, sans-serif" font-size="16" fill="#244c61" font-weight="700">MainForm — Каталог книг (BookCatalogWinForms)</text>
+  <circle cx="752" cy="22" r="6" fill="#d97777"/>
+  <circle cx="732" cy="22" r="6" fill="#e5b567"/>
+  <circle cx="712" cy="22" r="6" fill="#68b684"/>
+
+  <!-- Top search bar -->
+  <text x="26" y="72" font-family="Montserrat, Arial, sans-serif" font-size="14" fill="#233e51" font-weight="600">Пошук за Id:</text>
+  <rect x="132" y="50" width="108" height="32" rx="5" fill="#ffffff" stroke="#8ca2b2" stroke-width="2"/>
+  <text x="142" y="71" font-family="Consolas, monospace" font-size="13.5" fill="#325b6b">txtSearchId</text>
+  <rect x="250" y="50" width="125" height="32" rx="6" fill="#e6eef3" stroke="#91acbb" stroke-width="1.5"/>
+  <text x="312" y="71" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#27576b">Знайти (btnFind)</text>
+
+  <!-- Left ListBox -->
+  <text x="26" y="106" font-family="Consolas, monospace" font-size="13" fill="#00828a" font-weight="700">lstBooks (ListBox)</text>
+  <rect x="26" y="114" width="350" height="206" rx="6" fill="#fafcfd" stroke="#8ca2b2" stroke-width="2"/>
+  <rect x="32" y="122" width="338" height="30" rx="4" fill="#d8eff2"/>
+  <text x="42" y="142" font-family="Consolas, monospace" font-size="13.5" fill="#174954" font-weight="700">1 | Алгоритми | Олена Коваль</text>
+  <text x="42" y="174" font-family="Consolas, monospace" font-size="13.5" fill="#233e51">2 | Основи C# | Марія Литвин</text>
+  <text x="42" y="204" font-family="Consolas, monospace" font-size="13.5" fill="#233e51">3 | Структури даних | Іван Петренко</text>
+
+  <!-- Right Editor -->
+  <text x="404" y="136" font-family="Montserrat, Arial, sans-serif" font-size="15" fill="#233e51" font-weight="600">Назва:</text>
+  <rect x="486" y="114" width="264" height="34" rx="5" fill="#ffffff" stroke="#8ca2b2" stroke-width="2"/>
+  <text x="498" y="136" font-family="Consolas, monospace" font-size="14" fill="#325b6b">txtTitle</text>
+
+  <text x="404" y="186" font-family="Montserrat, Arial, sans-serif" font-size="15" fill="#233e51" font-weight="600">Автор:</text>
+  <rect x="486" y="164" width="264" height="34" rx="5" fill="#ffffff" stroke="#8ca2b2" stroke-width="2"/>
+  <text x="498" y="186" font-family="Consolas, monospace" font-size="14" fill="#325b6b">txtAuthor</text>
+
+  <!-- Buttons 2x2 -->
+  <rect x="404" y="222" width="166" height="36" rx="6" fill="#00828a"/>
+  <text x="487" y="245" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700" fill="#ffffff">Додати (btnAdd)</text>
+
+  <rect x="584" y="222" width="166" height="36" rx="6" fill="#e6eef3" stroke="#91acbb" stroke-width="1.5"/>
+  <text x="667" y="245" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="600" fill="#27576b">Оновити (btnUpdate)</text>
+
+  <rect x="404" y="272" width="166" height="36" rx="6" fill="#fceaea" stroke="#d49090" stroke-width="1.5"/>
+  <text x="487" y="295" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="600" fill="#8f2d2d">Видалити (btnDelete)</text>
+
+  <rect x="584" y="272" width="166" height="36" rx="6" fill="#e6eef3" stroke="#91acbb" stroke-width="1.5"/>
+  <text x="667" y="295" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="600" fill="#27576b">Очистити (btnClear)</text>
+
+  <!-- Status bar -->
+  <rect x="26" y="336" width="724" height="32" rx="5" fill="#f0f7f8" stroke="#c3dce0"/>
+  <text x="38" y="357" font-family="Montserrat, Arial, sans-serif" font-size="13.5" fill="#1b5c63"><tspan font-family="Consolas, monospace" font-weight="700">lblStatus:</tspan> Виберіть книгу або введіть дані для додавання.</text>
+</svg></div>
+<div class="box light-blue-box tight-box"><p>Блок пошуку за <code>Id</code> угорі дозволяє перевірити метод <code>Read(id)</code> і розмежування помилок UI (<code>TryParse</code>) та Service (<code>null</code>).</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">16 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="4" aria-label="Слайд 17: Етап 1. Поле сервісу та конструктор MainForm"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 1. Поле сервісу та конструктор MainForm</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text"><strong>Задача етапу:</strong> підключити <code>BookCatalog</code>, заповнити стартові книги через <code>Create</code> і показати їх у <code>lstBooks</code>.</p>
+<pre class="code-block"><code class="language-csharp">using System;
+using System.Windows.Forms;
+
+namespace BookCatalogWinForms;
+
+public partial class MainForm : Form
+{
+    private readonly BookCatalog _catalog = new BookCatalog();
+
+    public MainForm()
+    {
+        InitializeComponent();
+    }
+}</code></pre>
+<div class="box light-blue-box tight-box"><p><code>InitializeComponent()</code> налаштовує контролі й підписки з Designer — не дублюйте їх у конструкторі через <code>+=</code>.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">17 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="4" aria-label="Слайд 18: Етап 1. Метод синхронізації RefreshList()"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 1. Метод синхронізації RefreshList()</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Окремий допоміжний метод заповнює <code>ListBox</code> виключно з <code>_catalog.ReadAll()</code>:</p>
+<pre class="code-block"><code class="language-csharp">private void RefreshList()
+{
+    lstBooks.Items.Clear();
+
+    foreach (Book book in _catalog.ReadAll())
+    {
+        lstBooks.Items.Add(book);
+    }
+
+    btnUpdate.Enabled = false;
+    btnDelete.Enabled = false;
+}</code></pre>
+<div class="box success-box tight-box"><p>Зауважте: <code>ReadAll()</code> повертає <code>IReadOnlyList&lt;Book&gt;</code>, тому форма може перебирати книги через <code>foreach</code>, але не змінювати колекцію сервісу.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">18 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="4" aria-label="Слайд 19: Чому в ListBox зберігаємо саме об’єкти Book?"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Чому в ListBox зберігаємо об’єкти Book?</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="two-columns">
+<div class="box success-box"><h4>Зберігаємо об’єкт Book</h4><ul class="standard-list"><li><code>lstBooks.Items.Add(book);</code></li><li>WinForms викликає <code>Book.ToString()</code> → <code>1 | Алгоритми | Олена Коваль</code>.</li><li>Через <code>SelectedItem</code> одразу маємо <code>selected.Id</code>, <code>selected.Title</code>, <code>selected.Author</code>.</li></ul></div>
+<div class="box warning-box"><h4>Якщо зберігати лише рядки</h4><ul class="standard-list"><li><code>lstBooks.Items.Add(book.ToString());</code></li><li><code>SelectedItem</code> буде типом <code>string</code>, а не <code>Book</code>.</li><li>Для <code>Update</code> чи <code>Delete</code> довелося б розбирати текст, щоб дістати <code>Id</code>.</li></ul></div>
+</div>
+<div class="box primary-box tight-box"><p>Згадайте Лекцію 11 (слайд 17): перевизначений <code>Book.ToString()</code> автоматично працює і в консолі, і в <code>ListBox</code>!</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">19 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="4" aria-label="Слайд 20: Етап 1. Початкові дані в MainForm_Load"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 1. Початкові дані в MainForm_Load</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Оскільки <code>BookCatalog</code> з Лекції 11 створюється порожнім, додамо 3 стартові книги через його публічний <code>Create</code> у <code>MainForm_Load</code>:</p>
+<pre class="code-block"><code class="language-csharp">private void MainForm_Load(object? sender, EventArgs e)
+{
+    _catalog.Create(&quot;Алгоритми&quot;, &quot;Олена Коваль&quot;);
+    _catalog.Create(&quot;Основи C#&quot;, &quot;Марія Литвин&quot;);
+    _catalog.Create(&quot;Структури даних&quot;, &quot;Іван Петренко&quot;);
+
+    RefreshList();
+    lblStatus.Text = &quot;Виберіть книгу або введіть дані для додавання.&quot;;
+}</code></pre>
+<div class="box success-box tight-box"><p><strong>Перевірка Етапу 1:</strong> запустіть форму. У <code>lstBooks</code> мають з’явитися три книги (Id 1–3), а кнопки «Оновити» й «Видалити» — бути вимкненими.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">20 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="4" aria-label="Слайд 21: Контрольна зупинка 2/6: ListBox і ToString()"><header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 15 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 2/6</div><h2>Як ListBox показує об’єкти Book?</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">У <code>RefreshList()</code> викликається <code>lstBooks.Items.Add(book);</code> (без задання <code>DisplayMember</code>). Що побачить користувач у списку?</p>
+<div class="two-columns">
+<div class="box tight-box"><p><strong>A.</strong> Порожні рядки, бо <code>ListBox</code> не підтримує власні класи.</p><p><strong>B.</strong> Рядок формату <code>1 | Алгоритми | Олена Коваль</code> із <code>Book.ToString()</code>.</p></div>
+<div class="box tight-box"><p><strong>C.</strong> Помилку компіляції.</p><p><strong>D.</strong> Лише назву класу <code>BookCatalogWinForms.Book</code>.</p></div>
+</div>
+<div class="answer-check"><button type="button" class="answer-reveal" aria-expanded="false">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Правильна відповідь: B.</strong> <code>ListBox</code> викликає <code>ToString()</code> кожного елемента. Оскільки <code>Book</code> перевизначає <code>ToString()</code> (Лекція 11), відображається читабельний запис, а в <code>SelectedItem</code> зберігається сам об’єкт <code>Book</code>.</p></div></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">21 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="5" aria-label="Слайд 22: Етап 2. Додавання книги (Create): btnAdd_Click"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 2. Додавання книги: btnAdd_Click</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text"><strong>Задача етапу:</strong> реалізувати створення книги (<code>Create</code>) та пошук за ідентифікатором (<code>Read</code>).</p>
+<pre class="code-block"><code class="language-csharp">private void btnAdd_Click(object? sender, EventArgs e)
+{
+    string title = txtTitle.Text;
+    string author = txtAuthor.Text;
+
+    Book? created = _catalog.Create(title, author);
+    if (created is not null)
+    {
+        RefreshList();
+        txtTitle.Clear();
+        txtAuthor.Clear();
+        lblStatus.Text = $&quot;Книгу додано: {created}&quot;;
+    }
+    else
+    {
+        lblStatus.Text = &quot;[Відмова Service] Назва та автор не можуть бути порожніми.&quot;;
+    }
+}</code></pre>
+<div class="box light-blue-box tight-box"><p>Контракт той самий, що в Лекції 12: <code>created is null</code> означає відмову сервісу; поля при цьому не очищаються.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">22 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="5" aria-label="Слайд 23: Етап 2. Пошук за Id (Read): btnFind_Click"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 2. Пошук за Id: btnFind_Click</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Прямий графічний аналог <code>ReadId()</code> + <code>_catalog.Read(id)</code> із Лекції 12:</p>
+<pre class="code-block"><code class="language-csharp">private void btnFind_Click(object? sender, EventArgs e)
+{
+    if (!int.TryParse(txtSearchId.Text.Trim(), out int id) || id &lt;= 0)
+    {
+        lblStatus.Text = &quot;[Помилка формату UI] Введіть додатне ціле число Id.&quot;;
+        return;
+    }
+
+    Book? found = _catalog.Read(id);
+    if (found is null)
+    {
+        lblStatus.Text = $&quot;[Service] Книгу з Id = {id} не знайдено.&quot;;
+        return;
+    }
+
+    lstBooks.SelectedItem = found;
+    lblStatus.Text = $&quot;Знайдено: {found}&quot;;
+}</code></pre></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">23 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="5" aria-label="Слайд 24: Два рівні перевірок у btnFind_Click: abc проти 999"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Два рівні перевірок: abc, -5 і 999</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="table-wrap"><table class="slide-table compact">
+<thead><tr><th>Введено в txtSearchId</th><th>Який шар реагує</th><th>Результат у формі</th></tr></thead>
+<tbody>
+<tr><td><code>"abc"</code> або <code>"-5"</code></td><td><strong>MainForm (UI)</strong> — <code>int.TryParse</code> / <code>id &lt;= 0</code></td><td><code>[Помилка формату UI]</code>; <code>_catalog.Read()</code> <strong>не викликається</strong></td></tr>
+<tr><td><code>"999"</code></td><td><strong>BookCatalog (Service)</strong> — <code>Read(999) → null</code></td><td><code>[Service] Книгу з Id = 999 не знайдено.</code></td></tr>
+<tr><td><code>"2"</code></td><td><strong>Service + UI</strong> — знайдено об’єкт <code>Book</code></td><td>Книга виділяється в <code>lstBooks</code>, поля заповнюються</td></tr>
+</tbody></table></div>
+<div class="box primary-box tight-box"><p><strong>Чому працює <code>lstBooks.SelectedItem = found;</code>?</strong> Тому що <code>lstBooks</code> зберігає посилання на ті самі об’єкти <code>Book</code>, які повернув <code>_catalog.ReadAll()</code>.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">24 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="5" aria-label="Слайд 25: Контрольна зупинка 3/6: помилка UI проти відмови Service"><header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 15 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 3/6</div><h2>Чому для "abc" і "999" різні маршрути?</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">Користувач спершу ввів у <code>txtSearchId</code> текст <code>"abc"</code>, а потім — число <code>"999"</code>. У якому випадку буде викликано <code>_catalog.Read(id)</code>?</p>
+<div class="two-columns">
+<div class="box tight-box"><p><strong>A.</strong> В обох випадках — сервіс сам парсить текст.</p><p><strong>B.</strong> Лише для <code>"999"</code>; для <code>"abc"</code> пошук зупинить <code>int.TryParse</code> у UI.</p></div>
+<div class="box tight-box"><p><strong>C.</strong> Лише для <code>"abc"</code>.</p><p><strong>D.</strong> У жодному — <code>ListBox</code> шукає самостійно.</p></div>
+</div>
+<div class="answer-check"><button type="button" class="answer-reveal" aria-expanded="false">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Правильна відповідь: B.</strong> Контракт <code>BookCatalog.Read(int id)</code> приймає готове число <code>int</code>. Розбір тексту — відповідальність UI, а перевірка наявності запису з таким <code>Id</code> — відповідальність Service.</p></div></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">25 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 26: Етап 3. Допоміжні методи керування станом редактора"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 3. Допоміжні методи стану редактора</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Спершу додаємо три короткі методи — завдяки цьому форма компілюватиметься на кожному наступному кроці:</p>
+<pre class="code-block"><code class="language-csharp">private void ClearInputs()
+{
+    txtTitle.Clear();
+    txtAuthor.Clear();
+}
+
+private void UpdateButtonsState()
+{
+    bool hasSelection = lstBooks.SelectedItem is Book;
+    btnUpdate.Enabled = hasSelection;
+    btnDelete.Enabled = hasSelection;
+}
+
+private void ResetEditor()
+{
+    lstBooks.SelectedIndex = -1;
+    ClearInputs();
+    UpdateButtonsState();
+}</code></pre></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">26 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 27: Етап 3. Вибір книги: SelectedIndexChanged"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 3. Вибір книги: SelectedIndexChanged</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Коли користувач вибирає книгу в <code>lstBooks</code> (або її виділяє <code>btnFind_Click</code>), переносимо дані у поля форми:</p>
+<pre class="code-block"><code class="language-csharp">private void lstBooks_SelectedIndexChanged(object? sender, EventArgs e)
+{
+    if (lstBooks.SelectedItem is Book selected)
+    {
+        txtTitle.Text = selected.Title;
+        txtAuthor.Text = selected.Author;
+    }
+    else
+    {
+        ClearInputs();
+    }
+
+    UpdateButtonsState(); // БЕЗУМОВНО — поза гілкою if!
+}</code></pre>
+<div class="box light-orange-box tight-box"><p><code>Items.Clear()</code> або <code>SelectedIndex = -1</code> може викликати <code>SelectedIndexChanged</code> із <code>SelectedItem == null</code> — тому <code>UpdateButtonsState()</code> стоїть поза <code>if</code>.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">27 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 28: Оновлення RefreshList() і btnAdd_Click"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Оновлення RefreshList() і btnAdd_Click</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Тепер перевикористовуємо <code>UpdateButtonsState()</code> у <code>RefreshList()</code> і <code>ResetEditor()</code> у <code>btnAdd_Click</code>:</p>
+<div class="two-columns">
+<div><pre class="code-block"><code class="language-csharp">private void RefreshList()
+{
+    lstBooks.Items.Clear();
+    foreach (Book book in _catalog.ReadAll())
+        lstBooks.Items.Add(book);
+
+    UpdateButtonsState();
+}</code></pre></div>
+<div><pre class="code-block"><code class="language-csharp">// В успішній гілці btnAdd_Click:
+if (created is not null)
+{
+    RefreshList();
+    ResetEditor();
+    lblStatus.Text = $&quot;Книгу додано: {created}&quot;;
+}</code></pre></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">28 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 29: Незмінюваний Book і чому Update вимагає RefreshList()"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Незмінюваний Book: навіщо RefreshList()?</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Згадайте Лекцію 11 (слайд 26): властивості <code>Book</code> мають лише <code>get</code>, тому <code>BookCatalog.Update()</code> створює <strong>новий об’єкт</strong>:</p>
+<pre class="code-block"><code class="language-csharp">// Усередині BookCatalog.Update (Лекція 11):
+_books[index] = new Book(id, newTitle, newAuthor);</code></pre>
+<div class="two-columns">
+<div class="box success-box"><h4>Плюс інкапсуляції</h4><p>У <code>MainForm</code> навіть неможливо написати <code>selected.Title = ...</code> — компілятор сам захищає модель!</p></div>
+<div class="box warning-box"><h4>Важливий наслідок для UI</h4><p><code>lstBooks</code> тримає старе посилання. Лише <code>RefreshList()</code> замінює його на новий об’єкт <code>Book</code> із каталогу.</p></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">29 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 30: Етап 3. Оновлення книги: btnUpdate_Click"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 3. Оновлення книги: btnUpdate_Click</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Беремо <code>selected.Id</code> із вибраного об’єкта і делегуємо оновлення методу <code>_catalog.Update(...)</code>:</p>
+<pre class="code-block"><code class="language-csharp">private void btnUpdate_Click(object? sender, EventArgs e)
+{
+    if (lstBooks.SelectedItem is not Book selected)
+    {
+        lblStatus.Text = &quot;Спочатку виберіть книгу у списку.&quot;;
+        return;
+    }
+
+    bool updated = _catalog.Update(selected.Id, txtTitle.Text, txtAuthor.Text);
+    if (updated)
+    {
+        RefreshList();
+        ResetEditor();
+        lblStatus.Text = $&quot;Книгу #{selected.Id} успішно оновлено.&quot;;
+    }
+    else
+    {
+        lblStatus.Text = &quot;[Відмова Service] Не вдалося оновити: перевірте назву й автора.&quot;;
+    }
+}</code></pre></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">30 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 31: Етап 3. Видалення з підтвердженням: btnDelete_Click"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Етап 3. Видалення книги: btnDelete_Click</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Діалог підтвердження належить UI, а вилучення за <code>Id</code> виконує <code>BookCatalog</code>:</p>
+<pre class="code-block"><code class="language-csharp">private void btnDelete_Click(object? sender, EventArgs e)
+{
+    if (lstBooks.SelectedItem is not Book selected)
+    {
+        lblStatus.Text = &quot;Спочатку виберіть книгу у списку.&quot;;
+        return;
+    }
+
+    DialogResult answer = MessageBox.Show(this,
+        $&quot;Видалити книгу «{selected.Title}» (Id = {selected.Id})?&quot;,
+        &quot;Підтвердження видалення&quot;, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+    if (answer != DialogResult.Yes) return;
+
+    if (_catalog.Delete(selected.Id))
+    {
+        RefreshList();
+        ResetEditor();
+        lblStatus.Text = $&quot;Книгу #{selected.Id} видалено.&quot;;
+    }
+    else lblStatus.Text = &quot;Книга вже відсутня в каталозі.&quot;;
+}</code></pre></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">31 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 32: Етап 3. Очищення та правило стану форми"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Очищення та правило стану після CRUD</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><pre class="code-block"><code class="language-csharp">private void btnClear_Click(object? sender, EventArgs e)
+{
+    txtSearchId.Clear();
+    ResetEditor();
+    lblStatus.Text = &quot;Поля очищено.&quot;;
+}</code></pre>
+<div class="two-columns">
+<div class="box success-box"><h4>Після успішного CRUD</h4><p><code>RefreshList()</code> → <code>ResetEditor()</code> → статус у <code>lblStatus</code>.</p><p class="metric-desc">У полях не лишаються застарілі дані видаленої чи попередньої книги.</p></div>
+<div class="box light-orange-box"><h4>Після помилки UI або Service</h4><p>Редактор <strong>не очищаємо</strong> — показуємо лише повідомлення.</p><p class="metric-desc">Користувач виправляє введений текст і повторює команду.</p></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">32 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 33: Контрольна зупинка 4/6: стан кнопок після Delete"><header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 15 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 4/6</div><h2>Що станеться, якщо UpdateButtonsState() лишити всередині if?</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">У <code>lstBooks_SelectedIndexChanged</code> розробник поставив <code>UpdateButtonsState()</code> <strong>усередину</strong> гілки <code>if (lstBooks.SelectedItem is Book selected)</code>. Після видалення книги <code>Items.Clear()</code> скидає вибір. Якими залишаться кнопки Update і Delete?</p>
+<div class="answer-check"><button type="button" class="answer-reveal" aria-expanded="false">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Кнопки залишаться візуально активними (<code>Enabled = true</code>)</strong>, хоча <code>SelectedItem</code> уже <code>null</code>. Оскільки гілка <code>if</code> не виконалася, виклик <code>UpdateButtonsState()</code> пропустився. Цей метод завжди викликаємо <strong>безумовно</strong> — поза <code>if</code>.</p></div></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">33 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="6" aria-label="Слайд 34: Контрольна зупинка 5/6: незмінюваний Book і RefreshList()"><header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 15 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 5/6</div><h2>Чому без RefreshList() назва в ListBox не зміниться?</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">У <code>btnUpdate_Click</code> виклик <code>_catalog.Update(1, "Алгоритми C#", "Олена Коваль")</code> повернув <code>true</code>, але розробник забув викликати <code>RefreshList()</code>. Що показуватиме <code>lstBooks</code>?</p>
+<div class="two-columns">
+<div class="box tight-box"><p><strong>A.</strong> Одразу «Алгоритми C#», бо <code>ListBox</code> стежить за <code>BookCatalog</code>.</p><p><strong>B.</strong> Стару назву «Алгоритми», бо <code>lstBooks</code> тримає посилання на попередній екземпляр <code>Book</code>.</p></div>
+<div class="box tight-box"><p><strong>C.</strong> Порожній рядок.</p><p><strong>D.</strong> Програма впаде з винятком.</p></div>
+</div>
+<div class="answer-check"><button type="button" class="answer-reveal" aria-expanded="false">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Правильна відповідь: B.</strong> <code>BookCatalog.Update()</code> замінив елемент у <code>_books</code> новим об’єктом <code>Book</code>, а в <code>lstBooks.Items</code> лишилося старе посилання. Лише <code>RefreshList()</code> завантажує актуальні об’єкти через <code>ReadAll()</code>.</p></div></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">34 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="7" aria-label="Слайд 35: Наскрізний сценарій самоперевірки (8 кроків)"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Наскрізний сценарій перевірки (в одному запуску)</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="table-wrap"><table class="slide-table compact">
+<thead><tr><th>#</th><th>Дія користувача</th><th>Очікувана поведінка</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Відкрити форму</td><td>У списку 3 книги (Id 1–3); Update і Delete вимкнено</td></tr>
+<tr><td>2</td><td>У пошуку ввести <code>abc</code> → Find</td><td><code>[Помилка формату UI]</code>; сервіс не викликався</td></tr>
+<tr><td>3</td><td>У пошуку ввести <code>999</code> → Find</td><td><code>[Service] Книгу з Id = 999 не знайдено.</code></td></tr>
+<tr><td>4</td><td>У пошуку ввести <code>2</code> → Find</td><td>Книга #2 виділена в <code>lstBooks</code>; поля заповнено</td></tr>
+<tr><td>5</td><td>Увести «Чистий код» / «Р. Мартін» → Add</td><td>Додано книгу #4; список оновлено, поля очищено</td></tr>
+<tr><td>6</td><td>Увести пробіли в Назву / «Автор» → Add</td><td><code>[Відмова Service]</code>; список без змін, поля збережено</td></tr>
+<tr><td>7</td><td>Вибрати #1 → змінити назву → Update</td><td>У списку нова назва з тим самим <code>Id = 1</code>; редактор скинуто</td></tr>
+<tr><td>8</td><td>Вибрати #2 → Delete: <code>No</code>, потім <code>Yes</code></td><td><code>No</code> — без змін; <code>Yes</code> — книга зникла, наступна Add отримає <code>Id = 5</code></td></tr>
+</tbody></table></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">35 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="7" aria-label="Слайд 36: Діагностика за маршрутом однієї дії"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Діагностика за маршрутом однієї дії</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">Схема допомагає швидко визначити, на якому рівні зупинилася команда користувача:</p>
+<div class="box tight-box"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 315" width="100%" style="max-height:22cqw;display:block;margin:0 auto" role="img" aria-label="Схема діагностики маршруту дії між MainForm і BookCatalog">
+  <defs>
+    <marker id="arr15f" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#244c61"/>
+    </marker>
+    <marker id="arr15e" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 10 5 L 0 9 z" fill="#b45309"/>
+    </marker>
+  </defs>
+  <rect x="30" y="16" width="305" height="44" rx="8" fill="#e8f3fb" stroke="#3b82b6" stroke-width="2"/>
+  <text x="182" y="43" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13.5" font-weight="700" fill="#1b547d">1. Подія UI (Click) → ввід / TryParse</text>
+  <line x1="182" y1="60" x2="182" y2="92" stroke="#244c61" stroke-width="2" marker-end="url(#arr15f)"/>
+  <text x="192" y="81" font-family="Montserrat, Arial, sans-serif" font-size="12" fill="#226644" font-weight="600">ввід підготовлено</text>
+
+  <line x1="335" y1="38" x2="455" y2="38" stroke="#b45309" stroke-width="2" marker-end="url(#arr15e)"/>
+  <text x="395" y="30" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="12" fill="#b45309" font-weight="600">помилка формату</text>
+  <rect x="460" y="12" width="335" height="52" rx="8" fill="#fff4e6" stroke="#d99a4e" stroke-width="2"/>
+  <text x="627" y="34" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13.5" font-weight="700" fill="#9a5600">lblStatus: [Помилка формату UI]</text>
+  <text x="627" y="53" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="12" fill="#6b4414">BookCatalog не викликається</text>
+
+  <rect x="30" y="96" width="305" height="48" rx="8" fill="#e2f2f4" stroke="#00828a" stroke-width="2"/>
+  <text x="182" y="125" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13.5" font-weight="700" fill="#00666c">2. BookCatalog.Create / Read / Update / Delete</text>
+  <line x1="182" y1="144" x2="182" y2="178" stroke="#244c61" stroke-width="2" marker-end="url(#arr15f)"/>
+  <text x="192" y="166" font-family="Montserrat, Arial, sans-serif" font-size="12" fill="#226644" font-weight="600">Book / true</text>
+
+  <line x1="335" y1="120" x2="455" y2="120" stroke="#b45309" stroke-width="2" marker-end="url(#arr15e)"/>
+  <text x="395" y="112" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="12" fill="#b45309" font-weight="600">null / false</text>
+  <rect x="460" y="94" width="335" height="52" rx="8" fill="#fceaea" stroke="#d49090" stroke-width="2"/>
+  <text x="627" y="116" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="13.5" font-weight="700" fill="#8f2d2d">lblStatus: [Відмова Service]</text>
+  <text x="627" y="135" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="12" fill="#742a2a">Каталог без змін · поля збережено</text>
+
+  <rect x="30" y="182" width="460" height="46" rx="8" fill="#eaf6ee" stroke="#2f855a" stroke-width="2"/>
+  <text x="260" y="210" text-anchor="middle" font-family="Consolas, monospace" font-size="14" font-weight="700" fill="#226644">3. RefreshList() → ResetEditor() → lblStatus</text>
+  <line x1="260" y1="228" x2="260" y2="256" stroke="#244c61" stroke-width="2" marker-end="url(#arr15f)"/>
+
+  <rect x="30" y="260" width="460" height="42" rx="8" fill="#f4f8fa" stroke="#95b3c5" stroke-width="2"/>
+  <text x="260" y="286" text-anchor="middle" font-family="Montserrat, Arial, sans-serif" font-size="14" font-weight="700" fill="#244c61">4. lstBooks відображає актуальний стан BookCatalog</text>
+</svg></div>
+<p class="note">Каталог зберігається в оперативній пам’яті: після перезапуску програми <code>MainForm_Load</code> знову створить 3 стартові книги — це штатна поведінка.</p></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">36 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="7" aria-label="Слайд 37: Типові помилки інтеграції GUI"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Типові помилки інтеграції GUI</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="table-wrap"><table class="slide-table compact">
+<thead><tr><th>Симптом</th><th>Причина</th><th>Виправлення</th></tr></thead>
+<tbody>
+<tr><td>Після CRUD список не оновився</td><td>Забули викликати <code>RefreshList()</code></td><td>Викликати після кожного успішного CRUD</td></tr>
+<tr><td>Книги «зникають» між кліками</td><td><code>new BookCatalog()</code> усередині <code>Click</code></td><td>Зберігати одне поле <code>_catalog</code> у формі</td></tr>
+<tr><td><code>Update</code> / <code>Delete</code> видаляє не ту книгу</td><td>Передали <code>lstBooks.SelectedIndex</code> замість <code>selected.Id</code></td><td>Завжди передавати <code>selected.Id</code> (індекс ≠ Id!)</td></tr>
+<tr><td>Update/Delete активні без вибору</td><td><code>UpdateButtonsState()</code> усередині <code>if</code></td><td>Викликати безумовно + перевірка в <code>Click</code></td></tr>
+<tr><td>Кнопка не реагує / спрацьовує двічі</td><td>Немає підписки або подвійна підписка</td><td>Перевірити <strong>Properties → Events</strong></td></tr>
+</tbody></table></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">37 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="7" aria-label="Слайд 38: Нагадування з Лекції 11: SelectedIndex ≠ Book.Id"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Критична пастка WinForms: SelectedIndex ≠ Id</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p>Після видалення книги з <code>Id = 2</code> у списку залишаються книги з <code>Id = 1</code> (індекс 0) та <code>Id = 3</code> (індекс 1).</p>
+<div class="two-columns">
+<div class="box warning-box"><h4>Неправильно</h4><pre class="code-block"><code class="language-csharp">// НЕБЕЗПЕЧНО! Індекс списку != Id книги
+_catalog.Delete(lstBooks.SelectedIndex);</code></pre></div>
+<div class="box success-box"><h4>Правильно</h4><pre class="code-block"><code class="language-csharp">if (lstBooks.SelectedItem is Book selected)
+    _catalog.Delete(selected.Id);</code></pre></div>
+</div>
+<div class="box primary-box tight-box"><p>Саме тому в <code>lstBooks</code> зберігаємо об’єкти <code>Book</code> і завжди працюємо через <code>selected.Id</code>.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">38 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="7" aria-label="Слайд 39: Налагодження у Visual Studio"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Налагодження у Visual Studio</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="flow-steps">
+<div class="flow-step"><strong>F9</strong><small>Точка зупинки</small></div>
+<div class="flow-step"><strong>F5</strong><small>Запуск із Debug</small></div>
+<div class="flow-step"><strong>F10 / F11</strong><small>Кроки виконання</small></div>
+<div class="flow-step"><strong>Locals / Watch</strong><small>Стан змінних</small></div>
+</div>
+<div class="two-columns">
+<div class="box light-blue-box"><h4>Дослід 1: пошук за Id</h4><p>Поставте точки зупинки у <code>btnFind_Click</code> і <code>BookCatalog.Read</code>. Простежте різницю між вводом <code>abc</code>, <code>999</code> і <code>2</code>.</p></div>
+<div class="box success-box"><h4>Дослід 2: оновлення й вибір</h4><p>Поставте точки зупинки в <code>RefreshList()</code> і <code>lstBooks_SelectedIndexChanged()</code>. Простежте порядок подій після <code>Items.Clear()</code>.</p></div>
+</div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">39 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="7" aria-label="Слайд 40: Місток до лабораторної №26: інші контракти Service"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Місток до лабораторних: BookCatalog vs ProductService</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">Архітектура <code>MainForm → Service → Model</code> однакова для будь-якої предметної області. Можуть відрізнятися лише деталі контракту:</p>
+<div class="table-wrap"><table class="slide-table compact">
+<thead><tr><th>Особливість</th><th>BookCatalog (Лекції 11–15)</th><th>ProductService (Лабораторні 21–26)</th></tr></thead>
+<tbody>
+<tr><td>Повідомлення про помилку</td><td>Повертає <code>null</code> / <code>false</code>; текст формує UI</td><td>Повертає <code>bool</code> + <code>out string errorMessage</code></td></tr>
+<tr><td>Типи полів редагування</td><td>Рядки + числовий <code>Id</code> у пошуку (<code>int.TryParse</code>)</td><td>Рядок + числа <code>decimal</code> / <code>int</code> (<code>TryParse</code> у UI)</td></tr>
+<tr><td>Змінюваність моделі</td><td><code>Book</code> незмінюваний (лише <code>get</code>)</td><td><code>Product</code> змінюваний — але UI все одно <strong>не має права</strong> змінювати <code>selected.Price</code> напряму!</td></tr>
+</tbody></table></div>
+<div class="box primary-box tight-box"><p><strong>У лабораторній №26</strong> застосуйте той самий підхід до вашого сервісу (зокрема винесіть спільний <code>TryParse</code> для <code>Add</code> і <code>Update</code> у приватний метод форми).</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">40 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="7" aria-label="Слайд 41: Контрольна зупинка 6/6: діагностика помилки"><header class="slide-header"><div class="eyebrow">ЛЕКЦІЯ 15 <span>•</span> КОНТРОЛЬНА ЗУПИНКА 6/6</div><h2>Знайдіть помилку в обробнику btnDelete_Click</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><p class="intro-text">У каталозі книги з <code>Id = 1, 3, 4</code>. Користувач вибрав третій рядок (<code>Id = 4</code>) і натиснув «Видалити». Що зробить цей код?</p>
+<pre class="code-block"><code class="language-csharp">private void btnDelete_Click(object? sender, EventArgs e)
+{
+    int id = lstBooks.SelectedIndex;
+    if (_catalog.Delete(id))
+    {
+        RefreshList();
+        ResetEditor();
+    }
+}</code></pre>
+<div class="answer-check"><button type="button" class="answer-reveal" aria-expanded="false">Показати відповідь і пояснення</button><div class="box light-blue-box answer-panel answer-hidden"><p><strong>Нічого не видалить (або видалить іншу книгу!).</strong> Для третього рядка <code>SelectedIndex == 2</code>, але книги з <code>Id = 2</code> уже немає (а якби вибрали другий рядок <code>Id = 3</code>, то <code>SelectedIndex == 1</code> видалив би книгу з <code>Id = 1</code>!). Потрібно отримувати <code>selected.Id</code> через <code>if (lstBooks.SelectedItem is Book selected)</code>.</p></div></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">41 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="8" aria-label="Слайд 42: Підсумки лекції 15"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Підсумки лекції 15</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="three-columns">
+<div class="box light-blue-box"><h4>Архітектура</h4><p><code>Book</code> і <code>BookCatalog</code> з Лекцій 11–12 працюють у Windows Forms без змін; <code>MainForm</code> замінив <code>ConsoleView</code>.</p></div>
+<div class="box success-box"><h4>Синхронізація</h4><p><code>BookCatalog</code> — єдине джерело даних; після успішного CRUD викликаємо <code>RefreshList()</code> і <code>ResetEditor()</code>.</p></div>
+<div class="box light-orange-box"><h4>Межа відповідальностей</h4><p>UI обробляє події, <code>TryParse</code>, <code>MessageBox</code> і вивід; Service керує колекцією та бізнес-правилами.</p></div>
+</div>
+<div class="box primary-box tight-box"><p><strong>Поза межами лекції:</strong> <code>DataGridView</code>, <code>DataBinding</code>, збереження даних у файлі чи БД та DI-контейнери.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">42 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="8" aria-label="Слайд 43: Питання для самоперевірки"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Питання для самоперевірки</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><ul class="standard-list">
+<li>Чому <code>BookCatalog</code> із Лекції 11 можна підключити до Windows Forms без переписування CRUD?</li>
+<li>Чому <code>_catalog</code> зберігається в полі <code>MainForm</code>, а не створюється у кожному обробнику <code>Click</code>?</li>
+<li>Навіщо додавати до <code>lstBooks.Items</code> об’єкти <code>Book</code>, а не рядки <code>book.ToString()</code>?</li>
+<li>Чому передавання <code>lstBooks.SelectedIndex</code> у <code>_catalog.Delete(...)</code> є помилкою?</li>
+<li>Чому після <code>_catalog.Update(...)</code> без <code>RefreshList()</code> список показуватиме стару назву книги?</li>
+<li>Чому для <code>txtSearchId = "abc"</code> метод <code>_catalog.Read()</code> не викликається, а для <code>"999"</code> — викликається?</li>
+<li>Чому <code>UpdateButtonsState()</code> потрібно викликати за межами гілки <code>if (selected ...)</code>?</li>
+</ul></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">43 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+<section class="slide" data-section="8" aria-label="Слайд 44: Джерела та подальша практика"><header class="slide-header"><div class="eyebrow">ООП <span>•</span> ЛЕКЦІЯ 15</div><h2>Джерела та подальша практика</h2></header><div class="slide-body legacy-slide-body"><div class="legacy-content"><div class="box light-blue-box">
+<h4>Офіційна документація та попередні лекції</h4>
+<ul class="standard-list">
+<li><a href="https://learn.microsoft.com/en-us/dotnet/desktop/winforms/controls/listbox-control-overview-windows-forms" target="_blank" rel="noopener noreferrer">Microsoft Learn — ListBox Control Overview</a></li>
+<li><a href="https://learn.microsoft.com/en-us/dotnet/api/system.windows.forms.listbox.selectedindexchanged" target="_blank" rel="noopener noreferrer">Microsoft Learn — ListBox.SelectedIndexChanged</a></li>
+<li><a href="https://learn.microsoft.com/en-us/dotnet/desktop/winforms/controls/how-to-add-an-event-handler" target="_blank" rel="noopener noreferrer">Microsoft Learn — How to add or remove an event handler</a></li>
+<li><a href="https://vyaskevych.github.io/learn_csharp/lect_11#slide-1" target="_blank" rel="noopener noreferrer">Лекція 11. Життєвий цикл сутностей (CRUD)</a> · <a href="https://vyaskevych.github.io/learn_csharp/lect_12#slide-1" target="_blank" rel="noopener noreferrer">Лекція 12. Багатошарова архітектура та SRP</a></li>
+</ul>
+</div>
+<div class="box primary-box tight-box"><p><strong>Наступний крок:</strong> у лабораторній №26 інтегруйте власний сервіс із Модуля 5 (наприклад, <code>ProductService</code>) із графічною формою Windows Forms за цією архітектурою.</p></div></div></div><footer class="slide-footer"><span class="uni-small">Київський столичний університет імені Бориса Грінченка · F3 Комп’ютерні науки</span><div class="nav-cluster"><button type="button" class="nav-btn prev" aria-label="Попередній слайд" title="Назад (←)">←</button><span class="counter">44 / 44</span><button type="button" class="nav-btn next" aria-label="Наступний слайд" title="Далі (→)">→</button></div></footer></section>
+</div>
+<div class="progress" aria-hidden="true"><span></span></div>
+<div class="keyboard-hint">Керування: ← → / пробіл · O — усі слайди · F — повний екран</div>
+</main>
+<div class="overview" id="overview"><div class="overview-top"><span>Огляд усіх слайдів</span><button type="button" class="utility" id="close-overview">Закрити ×</button></div><div class="overview-items" id="overview-items"></div></div>
+<script src="script.js" defer></script>
+<script src="oop.js" defer></script>
+</body>
+</html>
